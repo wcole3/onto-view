@@ -1,1 +1,44 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Python virtual environments
+.venv/
+venv/
+
+# Test and lint caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Coverage output
+.coverage
+coverage.xml
+htmlcov/
+
+# Node modules and build output
+node_modules/
+frontend/dist/
+
+# Playwright reports
+playwright-report/
+test-results/
+
+# Environment files
+.env
+
+# Application data directory (user workspaces)
+data/
+backend/data/
+
+# Generated synthetic performance fixtures
+generated-fixtures/
+
+# IDE files
 .vscode/
+.idea/
+
+# Operating-system metadata
+.DS_Store
+Thumbs.db
