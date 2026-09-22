@@ -6,54 +6,42 @@ Report security issues privately to the repository maintainer (wcole) via
 GitHub private vulnerability reporting or direct email. Do not open public
 issues for vulnerabilities.
 
-## Main threat areas
+## Threat model
 
-This application processes untrusted structured files. The main threat areas
-are:
+onto-view is a static client-side application. There is no server, no
+database, no authentication and no user data leaving the browser except where
+noted below. Files you load are parsed in the tab and never uploaded.
 
-- **Untrusted uploads** — parsed content must never be executed or served as
-  executable HTML.
-- **XML entities** — RDF/XML and XML catalogs are parsed with protections
-  against entity expansion; `DOCTYPE` declarations are rejected in uploaded
-  RDF/XML.
-- **Remote JSON-LD contexts** — JSON-LD documents that reference remote
-  contexts are rejected by default.
-- **SSRF through imports** — network import resolution (disabled by default)
-  restricts schemes to HTTP/HTTPS, rejects credentials and private/loopback
-  addresses, revalidates every redirect, and applies host allowlists, byte
-  limits, and timeouts.
-- **Path traversal** — uploaded filenames are sanitized; stored files live
-  under generated IDs; all path joins are confined to the data directory.
-- **Zip bombs** — archives are not accepted in version 1; if added later they
-  must enforce compression-ratio limits.
-- **Expensive graph queries** — node, edge, depth, and evidence limits are
-  enforced server-side regardless of client requests.
+That removes most of the usual surface, and leaves these:
 
-## Network imports are disabled by default
+- **Untrusted input files.** Parsed RDF is treated strictly as data. Labels,
+  comments and IRIs are rendered as text, never as markup, so a crafted
+  ontology cannot inject script. Graph and element counts are bounded before
+  rendering so a large file degrades into a warning rather than a hung tab.
+- **XML entity expansion.** RDF/XML is parsed by
+  `rdfxml-streaming-parser`, which does not process external entities. Do not
+  replace it with a parser that resolves `DOCTYPE` declarations.
+- **Remote JSON-LD contexts.** A JSON-LD file whose `@context` is a URL causes
+  the parser to fetch that URL from the browser. This is subject to CORS and is
+  surfaced as a parse warning when it fails. Treat it as the one outbound
+  request the app can make on a file's behalf.
+- **Browser storage.** Autosaved work is held in IndexedDB under the page's
+  origin. It is not encrypted and is readable by anything else running on that
+  origin. Do not load ontologies containing secrets.
 
-`ONTOVIEW_NETWORK_IMPORTS_ENABLED` defaults to `false`. Import resolution uses
-already-loaded sources, explicit IRI-to-file mappings, XML catalogs, and local
-import roots only. Enabling network imports requires a security review.
+## Not applicable
 
-## Arbitrary file:// imports are rejected
+Earlier revisions of this document described SSRF protections, upload
+sanitization, path-traversal defences, zip-bomb limits and server-side query
+limits. Those described a backend service that no longer exists.
 
-Local import resolution only searches configured import roots. Clients cannot
-request arbitrary filesystem paths through the API.
+## No `owl:imports` resolution
 
-## Upload and graph limits
-
-Configurable limits (see `.env.example`) bound per-file upload size, total
-workspace size, source counts, import depth and count, returned graph nodes
-and edges, and embedded evidence entries. Limits are enforced while streaming
-uploads, not after the fact.
+Imports are not followed. An `owl:imports` triple is displayed as an edge and
+nothing is fetched. If import resolution is ever added, it needs an explicit
+security review first — a remote-fetching import resolver reintroduces the
+entire SSRF surface.
 
 ## Supported release policy
 
-Only the latest released version receives security fixes. Development builds
-are unsupported.
-
-## No unrestricted SPARQL
-
-Version 1 does not expose a SPARQL endpoint. Querying is limited to the
-controlled graph-projection and entity-statement endpoints with server-side
-limits.
+Only the latest release receives fixes. Development builds are unsupported.

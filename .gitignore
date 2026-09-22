@@ -1,39 +1,15 @@
-# Python bytecode
-__pycache__/
-*.py[cod]
-
-# Python virtual environments
-.venv/
-venv/
-
-# Test and lint caches
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-*.egg-info/
-
-# Coverage output
-.coverage
-coverage.xml
-htmlcov/
-
-# Node modules and build output
+# Dependencies and build output
 node_modules/
-frontend/dist/
+dist/
+.vite/
 
-# Playwright reports
+# Playwright output (suite lands in stage 6)
 playwright-report/
 test-results/
 
 # Environment files
 .env
-
-# Application data directory (user workspaces)
-data/
-backend/data/
-
-# Generated synthetic performance fixtures
-generated-fixtures/
+.env.local
 
 # IDE files
 .vscode/
@@ -42,3 +18,4 @@ generated-fixtures/
 # Operating-system metadata
 .DS_Store
 Thumbs.db
+.playwright-cli/

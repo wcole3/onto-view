@@ -1,135 +1,72 @@
-# Ontology Viewer
+# onto-view
 
-A browser-based viewer for RDF, OWL, and LinkML ontologies. Upload one or more
-ontology files, and explore them as interactive graphs with full provenance:
-every node and edge shows which source document and logical ontology declares
-or asserts it.
+A browser-only viewer and editor for RDF and OWL ontologies. Load one or more
+files, explore them as an interactive graph, edit the common things, and
+download the result. There is no server and no build step beyond Vite — the
+whole thing is a static bundle.
 
-## Features
+## Status
 
-- Load RDF/XML, Turtle, N-Triples, N-Quads, TriG, and safe JSON-LD
-- Load LinkML schemas (YAML and JSON)
-- Multiple simultaneous sources with distinct colors and provenance
-- Four views: raw RDF, OWL semantic, LinkML schema, ontology overview
-- Shared IRIs merge into one node that records all contributing sources
-- Cross-ontology references are highlighted
-- Controlled import resolution (already-loaded, explicit mappings, XML
-  catalogs, local roots; network disabled by default)
-- CCO (Common Core Ontologies) display profile
-- WebGL rendering (Sigma.js) with layouts run in Web Workers
+Under active rewrite. What works today:
 
-## Supported formats
+- [x] Tool shell, design tokens, Cytoscape renderer with four layouts
+- [ ] Load Turtle, N-Triples, JSON-LD and RDF/XML files
+- [ ] Multiple sources with per-source colours and visibility toggles
+- [ ] Export to Turtle, N-Triples and JSON-LD
+- [ ] Entity inspector
+- [ ] Editing: classes, properties, labels, comments, `subClassOf`, domain/range
+- [ ] Autosave and best-effort RDF/XML export
 
-| Input | Version 1 support |
-|---|---|
-| RDF/XML | Yes |
-| Turtle | Yes |
-| N-Triples | Yes |
-| N-Quads | Yes |
-| TriG | Yes |
-| JSON-LD with local contexts | Yes |
-| JSON-LD requiring remote contexts | Rejected by default |
-| OWL encoded in any supported RDF format | Yes |
-| LinkML YAML / JSON | Yes |
-| OWL Functional Syntax | No (future adapter) |
-| Manchester OWL Syntax | No (future adapter) |
-| OBO format | No (future adapter) |
+The graph currently shown is a fixed fragment of the BFO continuant hierarchy,
+there to exercise the renderer until file loading lands.
 
-## Limitations (version 1)
+## Quick start
 
-- The OWL semantic view recognizes common structures (classes, properties,
-  subclass/equivalent/disjoint axioms, domain/range, inverse properties,
-  restrictions, imports). It is not a reasoner: no inferred closure, no
-  consistency checking. Unrecognized structures remain visible in the raw RDF
-  view.
-- One backend process; parsed data is held in memory and re-parsed lazily
-  after a restart.
-- Remote import fetching is disabled by default.
-- Node, edge, upload, and import limits are configurable and enforced.
-- No unrestricted SPARQL endpoint.
-
-## Screenshot
-
-_TODO: add screenshot once the renderer is complete._
-
-## Quick start with Docker
+Requires [Bun](https://bun.sh).
 
 ```sh
-make docker-up
+bun install
+bun run dev
 ```
 
-Then open <http://localhost:8080>. Workspace data persists in the `onto-data`
-volume. Stop with `make docker-down`.
+Other scripts: `bun run build`, `bun run preview`, `bun run test`,
+`bun run lint`, `bun run typecheck`.
 
-## Local development
+## Planned format support
 
-Requires Python 3.11+ and Node.js 24+.
+| Format | Read | Write |
+|---|---|---|
+| Turtle | planned | planned |
+| N-Triples / N-Quads | planned | planned |
+| TriG | planned | planned |
+| JSON-LD (local `@context`) | planned | planned |
+| JSON-LD (remote `@context`) | fetched if CORS allows | — |
+| RDF/XML | planned | best-effort only |
+| OWL in any of the above | planned | as above |
 
-### Backend
+RDF/XML is read-only in practice: no RDF/XML serializer exists for JavaScript,
+so writing it means a hand-rolled best-effort emitter that covers the striped
+`rdf:Description` form and nothing more. **Turtle is the recommended export
+format.**
 
-```sh
-make install-backend   # creates .venv and installs backend[dev]
-make dev-backend       # serves http://localhost:8000 (API docs at /docs)
-make test-backend      # pytest
-make lint-backend      # ruff + mypy
-```
+## Deliberate non-goals
 
-### Frontend
+- No reasoner. No inferred closure, no consistency checking.
+- No SPARQL endpoint.
+- No `owl:imports` resolution over the network.
+- No LinkML support. See [docs/ontology-viewer.md](docs/ontology-viewer.md) for
+  why LinkML is a poor canonical representation for arbitrary OWL.
 
-```sh
-make install-frontend  # npm ci (locked install)
-make dev-frontend      # Vite dev server on http://localhost:5173
-make test-frontend     # Vitest
-make lint-frontend     # ESLint + tsc
-```
+## Architecture in one paragraph
 
-The Vite dev server proxies `/api` to `http://localhost:8000`, so run both
-development servers together.
+Quads live in a single `N3.Store` outside React. Every mutation bumps a
+revision counter; React re-renders on that counter and rebuilds a derived
+`OntologyModel` wholesale, which is cheap because the store is indexed. The
+Cytoscape element list is derived from that model and then *diffed and patched*
+into the renderer, because replacing elements outright would discard every node
+position. Provenance is free: each quad's graph term is its source id, which
+drives node colouring and the source toggles.
 
-### Common make commands
+## Licence
 
-Run `make help` for the full list, including `test`, `lint`, `format`, `e2e`,
-`docker-up`, `docker-down`, `generate-large`, and `cco-smoke`.
-
-## Architecture summary
-
-A Python/FastAPI backend parses RDF (RDFLib) and LinkML (LinkML Runtime)
-sources, preserves each original file and its provenance, and projects both
-models into a shared visualization graph served as JSON. A React/TypeScript
-frontend renders that graph with Graphology + Sigma.js (WebGL), runs layouts in
-Web Workers, and provides source/ontology filtering, search, and a details
-panel with raw statements. Parsing, semantic projection, provenance, and
-rendering remain separate layers.
-
-See [docs/](docs/) for the research notes and the detailed implementation plan:
-
-- [Research and recommended design](docs/ontology-viewer.md)
-- [Detailed implementation plan](docs/ontology-viewer-impl-plan.md)
-
-## Security warnings about network imports
-
-Network import resolution is **disabled by default**. Enabling it
-(`ONTOVIEW_NETWORK_IMPORTS_ENABLED=true`) requires a configured host allowlist
-and has been reviewed for SSRF risks (private/loopback address rejection,
-redirect revalidation, byte and timeout limits). Do not enable it without
-reading [SECURITY.md](SECURITY.md).
-
-## Tests
-
-```sh
-make test          # backend + frontend unit tests
-make e2e           # Playwright end-to-end tests (requires running servers)
-```
-
-The CCO smoke test requires a local CCO checkout and is skipped unless
-`CCO_PATH` is set:
-
-```sh
-CCO_PATH=/path/to/CommonCoreOntologies make cco-smoke
-```
-
-## License
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines. This
-project is in early development; licensing terms will be finalized before the
-first release.
+Not yet chosen.

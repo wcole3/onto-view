@@ -1,0 +1,80 @@
+/*
+ * Design tokens. The single source of truth for colour, type, space and border.
+ *
+ * Both src/styles/global.css (DOM chrome) and src/graph/style.ts (the Cytoscape
+ * stylesheet) resolve their values from here at runtime, so the canvas and the
+ * surrounding UI cannot drift apart. No component should contain a literal hex.
+ */
+
+:root {
+  /* Surfaces — warm monochrome */
+  --surface-canvas: #fbfbfa;
+  --surface-raised: #ffffff;
+  --surface-sunken: #f7f6f3;
+  --surface-hover: #f2f1ee;
+
+  /* Borders — every divider in the app is exactly 1px of one of these */
+  --border: #eaeaea;
+  --border-strong: #d8d8d6;
+  --border-width: 1px;
+
+  /* Text — never pure black */
+  --text: #111111;
+  --text-secondary: #787774;
+  --text-inverse: #ffffff;
+
+  /* Semantic pastels. Chrome only — never used for graph node fills. */
+  --accent-red-bg: #fdebec;
+  --accent-red-fg: #9f2f2d;
+  --accent-blue-bg: #e1f3fe;
+  --accent-blue-fg: #1f6c9f;
+  --accent-green-bg: #edf3ec;
+  --accent-green-fg: #346538;
+  --accent-yellow-bg: #fbf3db;
+  --accent-yellow-fg: #956400;
+
+  /* Graph elements. Source colours arrive in Stage 3 as a validated
+     categorical palette; these are the structural, non-categorical parts. */
+  --graph-bg: #fbfbfa;
+  --graph-node-fill: #ffffff;
+  --graph-node-border: #787774;
+  --graph-node-label: #111111;
+  --graph-node-shared-fill: #ececeb;
+  --graph-edge: #c9c9c6;
+  --graph-edge-label: #787774;
+  --graph-selected: #1f6c9f;
+
+  /* Type */
+  --font-sans: "SF Pro Display", "Geist Sans", "Helvetica Neue", "Switzer",
+    -apple-system, sans-serif;
+  --font-mono: "Geist Mono", "SF Mono", "JetBrains Mono", ui-monospace, monospace;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-md: 14px;
+  --leading: 1.6;
+  --leading-tight: 1.35;
+  --tracking-wide: 0.06em;
+
+  /* Space — 4px base. A tool shell, so no macro-whitespace scale. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Radii — crisp, never pill-shaped on containers */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* Shell geometry */
+  --toolbar-height: 48px;
+  --sidebar-width: 220px;
+  --inspector-width: 320px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration: 160ms;
+}

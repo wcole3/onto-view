@@ -8,11 +8,4 @@ repos:
       - id: check-added-large-files
         args: ["--maxkb=1024"]
 
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.8
-    hooks:
-      - id: ruff-check
-        args: ["--fix"]
-      - id: ruff-format
-
-# Full test suites run in CI, not in pre-commit.
+# Lint, type checks and tests run in CI, not in pre-commit.

@@ -2,64 +2,63 @@
 
 ## Requirements
 
-- Python 3.11 or newer (3.12 recommended for CI parity)
-- Node.js 24+ with npm
-- Docker and Docker Compose (for containerized runs)
+[Bun](https://bun.sh). Nothing else — there is no backend and no container.
+
+## Setup
+
+```sh
+bun install
+bun run dev
+```
+
+## Before opening a pull request
+
+```sh
+bun run lint
+bun run typecheck
+bun run test
+bun run build
+```
+
+All four must pass. `bun run build` runs `tsc --noEmit` first, so a type error
+fails the build rather than shipping.
+
+Verify user-facing changes against the **production** build, not the dev
+server:
+
+```sh
+bun run build && bun run preview
+```
+
+Some failures only appear there — Node-shim resolution for the streaming
+parsers, and asset paths.
 
 ## Branch naming
 
-Use `feature/<short-description>`, `fix/<short-description>`, or
-`docs/<short-description>` branches off `main`.
-
-## Environment setup
-
-```sh
-make install-backend
-make install-frontend
-```
-
-Run the development servers with `make dev-backend` and `make dev-frontend`.
+`feature/<short-description>`, `fix/<short-description>` or
+`docs/<short-description>`, off `main`.
 
 ## Pull request rules
 
 - Keep pull requests small and focused on one behavior.
-- New behavior requires tests (backend pytest, frontend Vitest, or e2e where
-  user-facing).
-- Do not commit complete external ontology distributions (for example a full
-  CCO checkout) to the repository. Reference them by path or pinned release
-  instead.
+- New behavior requires tests. Unit tests colocate with the code they cover
+  (`src/**/*.test.ts`).
+- Anything that parses or serializes RDF needs a round-trip test: parse, edit,
+  serialize, reparse, compare quad sets.
+- Do not commit external ontology distributions (for example a full CCO
+  checkout). Reference them by path or pinned release.
+- Keep test fixtures small and hand-written.
 
-## Python formatting, linting, and typing
+## Design rules
 
-- Format with Ruff: `cd backend && ../.venv/bin/ruff format .`
-- Lint with Ruff: `cd backend && ../.venv/bin/ruff check .`
-- Type-check with mypy: `cd backend && ../.venv/bin/mypy app`
-- The backend must pass all three before review (`make lint-backend`).
+`src/styles/tokens.css` is the only place a colour, space, radius, border width
+or font stack is defined. `src/graph/style.ts` resolves the same custom
+properties at runtime so the canvas and the DOM chrome cannot drift apart.
 
-## TypeScript formatting, linting, and tests
+**No component should contain a literal hex value.** If you need a new colour,
+add a token.
 
-- Lint with ESLint: `cd frontend && npm run lint`
-- Type-check: `cd frontend && npm run typecheck`
-- Unit tests: `cd frontend && npm test`
-- The frontend must pass all three before review (`make lint-frontend`).
-
-## Fixture files
-
-Keep test fixtures small and hand-written. Generated performance fixtures live
-outside the repository (`generated-fixtures/`, git-ignored) and are produced by
-`make generate-large`.
-
-## Security review
-
-Any change that touches network fetching, import resolution, or upload handling
-requires an explicit security review before merging. See
-[SECURITY.md](SECURITY.md).
-
-## Pull request checklist
-
-- [ ] Backend tests pass: `make test-backend`
-- [ ] Frontend tests pass: `make test-frontend`
-- [ ] Lint and type checks pass: `make lint`
-- [ ] New behavior is covered by tests
-- [ ] No secrets, large binaries, or external ontology distributions committed
-- [ ] Security-sensitive changes flagged for review
+Two palettes exist and they are not interchangeable: the desaturated pastels
+are for chrome semantics (errors, warnings, selection), while graph node fills
+use a separate categorical palette chosen to stay distinguishable at small node
+sizes.
