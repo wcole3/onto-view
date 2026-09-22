@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { graphStylesheet, token } from "./style";
+import { SOURCE_COLORS } from "./palette";
 
 describe("token", () => {
   it("falls back when the custom property is not resolvable", () => {
@@ -56,5 +57,25 @@ describe("graphStylesheet", () => {
     const style = node.style as Record<string, unknown>;
     expect(style["background-color"]).toBe(token("--graph-node-fill"));
     expect(style["border-color"]).toBe(token("--graph-node-border"));
+  });
+});
+
+describe("the selection colour", () => {
+  // It used to be the palette's blue, which is also the colour of the first
+  // source loaded: selecting a node in the first ontology changed nothing a
+  // user could see.
+  it("is not one of the source colours", () => {
+    expect(SOURCE_COLORS as readonly string[]).not.toContain(token("--graph-selected"));
+  });
+
+  it("is what a selected node and edge are drawn in", () => {
+    const sheet = graphStylesheet();
+    const blockFor = (selector: string) => {
+      const block = sheet.find((entry) => "selector" in entry && entry.selector === selector);
+      if (!block || !("style" in block)) throw new Error(`expected ${selector}`);
+      return block.style as Record<string, unknown>;
+    };
+    expect(blockFor("node:selected")["border-color"]).toBe(token("--graph-selected"));
+    expect(blockFor("edge:selected")["line-color"]).toBe(token("--graph-selected"));
   });
 });

@@ -38,7 +38,7 @@ select {
 }
 
 :focus-visible {
-  outline: 2px solid var(--graph-selected);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 1px;
 }
 
@@ -196,7 +196,7 @@ select {
 
 .resizer:hover::after,
 .resizer:focus-visible::after {
-  background: var(--graph-selected);
+  background: var(--focus-ring);
 }
 
 .resizer:focus-visible {
@@ -478,11 +478,11 @@ select {
 }
 
 .search:focus-within {
-  border-color: var(--graph-selected);
+  border-color: var(--focus-ring);
   color: var(--text);
   /* The input itself has no outline, so the ring goes on the wrapper. Without
      this the search box is the one control with no visible focus state. */
-  outline: 2px solid var(--graph-selected);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 1px;
 }
 
@@ -631,7 +631,7 @@ select {
 /* The active-source radio is visually hidden, so focus has to show on the
    name beside it or keyboard users cannot see where they are. */
 .sources__name:has(input:focus-visible) span {
-  outline: 2px solid var(--graph-selected);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -685,7 +685,7 @@ select {
 }
 
 .input:focus {
-  border-color: var(--graph-selected);
+  border-color: var(--focus-ring);
   outline: none;
 }
 
@@ -871,7 +871,7 @@ select {
   background: var(--surface-hover);
 }
 .tree__row--selected {
-  background: var(--accent-blue-bg);
+  background: var(--accent-green-bg);
 }
 .tree__toggle {
   flex: none;

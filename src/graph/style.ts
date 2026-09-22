@@ -25,7 +25,7 @@ const FALLBACKS: Record<string, string> = {
   "--graph-node-shared-fill": "#ececeb",
   "--graph-edge": "#c9c9c6",
   "--graph-edge-label": "#787774",
-  "--graph-selected": "#1f6c9f",
+  "--graph-selected": "#1aa321",
   "--border": "#eaeaea",
   "--font-sans": "sans-serif",
   "--font-mono": "monospace",

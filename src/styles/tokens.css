@@ -24,6 +24,11 @@
   --text-secondary: #787774;
   --text-inverse: #ffffff;
 
+  /* Focus rings on the surrounding chrome. Deliberately not the canvas
+     selection colour: a focused control and a selected node are different
+     things, and the ring needs to read on white rather than on the canvas. */
+  --focus-ring: #1f6c9f;
+
   /* Semantic pastels. Chrome only — never used for graph node fills. */
   --accent-red-bg: #fdebec;
   --accent-red-fg: #9f2f2d;
@@ -43,7 +48,12 @@
   --graph-node-shared-fill: #ececeb;
   --graph-edge: #c9c9c6;
   --graph-edge-label: #787774;
-  --graph-selected: #1f6c9f;
+  /* Selection has to be unmistakable against every source colour, so it is not
+     drawn from SOURCE_COLORS: the blue it used to be was the first source's
+     own colour, which made a selected node in the first ontology invisible as
+     selected. This green is brighter and more saturated than the palette's
+     green, and holds 3.3:1 against both the canvas and a node fill. */
+  --graph-selected: #1aa321;
 
   /* Type */
   --font-sans: "SF Pro Display", "Geist Sans", "Helvetica Neue", "Switzer",
