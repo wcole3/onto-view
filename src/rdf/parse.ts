@@ -65,6 +65,17 @@ const N3_FORMATS: Partial<Record<Format, string>> = {
   trig: "TriG",
 };
 
+export interface ParseOptions {
+  /**
+   * Keep a graph term the document already carries, instead of replacing it
+   * with `sourceId`. Only the autosave snapshot sets this: its N-Quads were
+   * written from the store, so their graph terms are the source ids of a whole
+   * session and must survive the round trip. A file the user loads is one
+   * source whatever it says about graphs, so it keeps the default.
+   */
+  keepGraph?: boolean;
+}
+
 /**
  * Parses one document into quads tagged with `sourceId` as their graph term.
  *
@@ -82,10 +93,15 @@ export async function parseDocument(
   text: string,
   format: Format,
   sourceId: string,
+  { keepGraph = false }: ParseOptions = {},
 ): Promise<ParseResult> {
   const graph = namedNode(sourceId);
   const retag = (quads: RDF.Quad[]) =>
-    quads.map((q) => makeQuad(q.subject, q.predicate, q.object, graph));
+    quads.map((q) =>
+      keepGraph && q.graph.termType !== "DefaultGraph"
+        ? q
+        : makeQuad(q.subject, q.predicate, q.object, graph),
+    );
 
   const n3Format = N3_FORMATS[format];
   if (n3Format) {

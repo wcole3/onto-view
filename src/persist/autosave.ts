@@ -93,9 +93,13 @@ export async function readSnapshot(): Promise<RestoredSnapshot | null> {
     const snapshot = await get<Snapshot>(KEY);
     if (!snapshot?.nquads || !snapshot.sources?.length) return null;
 
-    // The graph terms in the N-Quads already carry the source ids, so the
-    // source id passed here is only a fallback for quads that somehow lack one.
-    const { quads } = await parseDocument(snapshot.nquads, "nquads", snapshot.sources[0].id);
+    // The graph terms in the N-Quads already carry the source ids, so they are
+    // kept; the source id passed here is only the fallback for a quad that
+    // somehow lacks one. Retagging them all would merge every source into the
+    // first one on restore, which is exactly what the N-Quads are here to stop.
+    const { quads } = await parseDocument(snapshot.nquads, "nquads", snapshot.sources[0].id, {
+      keepGraph: true,
+    });
     return { savedAt: snapshot.savedAt, sources: snapshot.sources, quads };
   } catch {
     // A snapshot that cannot be read is not worth blocking startup over.

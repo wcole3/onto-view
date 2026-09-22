@@ -33,6 +33,10 @@ describe("sniffFormat", () => {
   });
 });
 
+const NQUADS = `<http://x/A> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> <urn:onto-view:source:1> .
+<http://x/B> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> <urn:onto-view:source:2> .
+<http://x/C> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .`;
+
 describe("parseDocument", () => {
   it("tags every quad with the source id as its graph term", async () => {
     const { quads } = await parseDocument(TURTLE, "turtle", "urn:test:1");
@@ -61,5 +65,27 @@ describe("parseDocument", () => {
 
   it("rejects malformed input rather than returning nothing", async () => {
     await expect(parseDocument("this is not turtle {{{", "turtle", "urn:test:4")).rejects.toThrow();
+  });
+});
+
+describe("parseDocument with keepGraph", () => {
+  // The autosave snapshot is N-Quads written from the store, so its graph
+  // terms are a whole session's source ids. Retagging them would merge every
+  // source into whichever id the restore happened to pass.
+  it("keeps the graph terms a snapshot already carries", async () => {
+    const { quads } = await parseDocument(NQUADS, "nquads", "urn:onto-view:source:1", {
+      keepGraph: true,
+    });
+    expect(quads.map((q) => q.graph.value)).toEqual([
+      "urn:onto-view:source:1",
+      "urn:onto-view:source:2",
+      // A quad written without a graph still falls back to the source id.
+      "urn:onto-view:source:1",
+    ]);
+  });
+
+  it("retags everything without the option, as a loaded file should be", async () => {
+    const { quads } = await parseDocument(NQUADS, "nquads", "urn:onto-view:source:9");
+    expect(new Set(quads.map((q) => q.graph.value))).toEqual(new Set(["urn:onto-view:source:9"]));
   });
 });
