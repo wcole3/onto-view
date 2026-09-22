@@ -4,9 +4,11 @@ import { FileDrop, useWindowDrop } from "./ui/FileDrop";
 import { FilterControls, Toolbar } from "./ui/Toolbar";
 import { SourceList } from "./ui/SourceList";
 import { Export } from "./ui/Export";
+import { NewEntity } from "./ui/NewEntity";
 import { Inspector } from "./ui/Inspector";
 import { buildModel } from "./model/ontology";
 import {
+  clearLastEdit,
   quadStore,
   setFilters,
   setLoadError,
@@ -22,6 +24,7 @@ export default function App() {
   const filters = useAppStore((state) => state.filters);
   const selectedIri = useAppStore((state) => state.selectedIri);
   const loadError = useAppStore((state) => state.loadError);
+  const lastEdit = useAppStore((state) => state.lastEdit);
   const drop = useWindowDrop();
 
   const visibleSourceIds = useMemo(
@@ -80,6 +83,7 @@ export default function App() {
           </div>
           <div className="panel__body">
             <SourceList />
+            {hasSources ? <NewEntity /> : null}
             {hasSources ? <FilterControls /> : null}
             {hasSources ? <Export /> : null}
           </div>
@@ -93,6 +97,13 @@ export default function App() {
             <div className="banner banner--error" role="alert">
               <span>{loadError}</span>
               <button className="button" type="button" onClick={() => setLoadError(null)}>
+                Dismiss
+              </button>
+            </div>
+          ) : lastEdit ? (
+            <div className="banner banner--success" role="status">
+              <span>{lastEdit}</span>
+              <button className="button" type="button" onClick={clearLastEdit}>
                 Dismiss
               </button>
             </div>

@@ -17,7 +17,8 @@ Under active rewrite. What works today:
 - [x] Search, focus on a neighbourhood, depth limit from the hierarchy roots,
       kind filters, source visibility toggles
 - [x] Export to Turtle, N-Triples, N-Quads and JSON-LD, per source or merged
-- [ ] Editing: classes, properties, labels, comments, `subClassOf`, domain/range
+- [x] Editing: create, rename and delete entities; edit labels and comments;
+      add and remove `subClassOf`, `domain` and `range`; undo
 - [ ] Autosave and best-effort RDF/XML export
 
 Tested against real ontologies, not only fixtures: BFO (158 KB RDF/XML, 1,221
@@ -69,6 +70,21 @@ RDF/XML is read-only in practice: no RDF/XML serializer exists for JavaScript,
 so writing it means a hand-rolled best-effort emitter that covers the striped
 `rdf:Description` form and nothing more. **Turtle is the recommended export
 format.**
+
+## How editing behaves
+
+Two rules, applied consistently:
+
+- **Additions** go into the active source, chosen in the Sources panel. Each
+  source therefore stays independently exportable.
+- **Removals and renames** act wherever the statements actually are, across
+  every loaded source, and the app reports which ones it touched. A rename
+  confined to one source would leave stale references in the others, and
+  deleting a class while leaving the statements that point at it produces
+  dangling references — both corrupt the graph rather than editing it.
+
+Every edit is a pure function returning quads to add and remove, so undo is
+just those two sets swapped.
 
 ## Deliberate non-goals
 

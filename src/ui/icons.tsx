@@ -97,3 +97,20 @@ export function IconDownload() {
     </svg>
   );
 }
+
+export function IconPlus() {
+  return (
+    <svg {...base}>
+      <path d="M8 3.5v9M3.5 8h9" />
+    </svg>
+  );
+}
+
+export function IconUndo() {
+  return (
+    <svg {...base}>
+      <path d="M4 6.5H9.5a3.5 3.5 0 0 1 0 7H6" />
+      <path d="M6.5 4 4 6.5 6.5 9" />
+    </svg>
+  );
+}

@@ -567,3 +567,81 @@ select {
   margin: 0;
   font-size: var(--text-xs);
 }
+
+/* ---------- Text inputs ---------- */
+
+.input {
+  width: 100%;
+  padding: var(--space-1) var(--space-2);
+  background: var(--surface-raised);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  line-height: var(--leading-tight);
+  resize: vertical;
+}
+
+.input:hover {
+  border-color: var(--border-strong);
+}
+
+.input:focus {
+  border-color: var(--graph-selected);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+}
+
+.picker {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.picker .input {
+  min-width: 0;
+}
+
+/* ---------- Inspector actions ---------- */
+
+.details__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.inspector__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--border);
+}
+
+.inspector__actions .button {
+  justify-content: center;
+}
+
+.button--danger {
+  color: var(--accent-red-fg);
+  border-color: var(--border);
+}
+
+.button--danger:hover {
+  background: var(--accent-red-bg);
+  border-color: var(--accent-red-fg);
+}
+
+.banner--success {
+  background: var(--accent-green-bg);
+  border-color: var(--accent-green-fg);
+  color: var(--accent-green-fg);
+}
+
+.toolbar .tag {
+  background: var(--surface-sunken);
+}

@@ -1,6 +1,6 @@
 import { FileDrop } from "./FileDrop";
-import { IconGraph, IconLayout, IconSearch } from "./icons";
-import { setFilters, useAppStore } from "../model/store";
+import { IconGraph, IconLayout, IconSearch, IconUndo } from "./icons";
+import { setFilters, undoEdit, useAppStore } from "../model/store";
 import type { LayoutName } from "../graph/useCytoscape";
 
 const LAYOUTS: LayoutName[] = ["breadthfirst", "cose", "concentric", "grid"];
@@ -86,9 +86,30 @@ export function Toolbar({ layout, onLayout, onRelayout }: ToolbarProps) {
           Re-layout
         </button>
 
+        <UndoButton />
+
         <FileDrop variant="button" />
       </div>
     </header>
+  );
+}
+
+function UndoButton() {
+  const history = useAppStore((state) => state.history);
+  const last = history.at(-1);
+
+  return (
+    <button
+      className="button"
+      type="button"
+      onClick={undoEdit}
+      disabled={!last}
+      title={last ? last.description : "Nothing to undo"}
+    >
+      <IconUndo />
+      Undo
+      {history.length > 1 ? <span className="tag">{history.length}</span> : null}
+    </button>
   );
 }
 

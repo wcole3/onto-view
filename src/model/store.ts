@@ -3,6 +3,7 @@ import type * as RDF from "@rdfjs/types";
 import { create } from "zustand";
 
 import { SOURCE_COLORS } from "../graph/palette";
+import { affectedGraphs, invert, type EditResult } from "./edits";
 import { DEFAULT_FILTERS, type Filters, type Source } from "./types";
 
 /**
@@ -28,6 +29,10 @@ interface AppState {
   /** Incremented by every mutation of the quad store. */
   revision: number;
   loadError: string | null;
+  /** Applied edits, most recent last. Undo pops from the end. */
+  history: EditResult[];
+  /** Outcome of the last edit, shown briefly in the inspector. */
+  lastEdit: string | null;
 }
 
 export const useAppStore = create<AppState>(() => ({
@@ -37,6 +42,8 @@ export const useAppStore = create<AppState>(() => ({
   filters: DEFAULT_FILTERS,
   revision: 0,
   loadError: null,
+  history: [],
+  lastEdit: null,
 }));
 
 const bumpRevision = () => useAppStore.setState((state) => ({ revision: state.revision + 1 }));
@@ -106,11 +113,53 @@ export function setLoadError(message: string | null): void {
   useAppStore.setState({ loadError: message });
 }
 
-/** Applies an edit. Stage 5 routes every mutation through here. */
-export function applyEdit(change: { add?: RDF.Quad[]; remove?: RDF.Quad[] }): void {
-  if (change.remove?.length) quads.removeQuads(change.remove);
-  if (change.add?.length) quads.addQuads(change.add);
+/**
+ * Applies an edit and records it for undo.
+ *
+ * Removals run before additions so that replacing a value — which removes the
+ * old statement and adds a new one for the same subject and predicate — cannot
+ * remove what it just wrote.
+ */
+export function applyEdit(edit: EditResult, { record = true } = {}): void {
+  if (edit.remove.length === 0 && edit.add.length === 0) return;
+
+  quads.removeQuads(edit.remove);
+  quads.addQuads(edit.add);
+
+  const touched = affectedGraphs(edit);
+  useAppStore.setState((state) => ({
+    history: record ? [...state.history, edit] : state.history,
+    lastEdit: summarise(edit, touched, state.sources),
+    // A source's triple count is part of what the panel shows, so it has to
+    // follow the edit rather than stay at its load-time value.
+    sources: state.sources.map((source) => ({
+      ...source,
+      quadCount: touched.includes(source.id)
+        ? quads.countQuads(null, null, null, source.id)
+        : source.quadCount,
+    })),
+  }));
   bumpRevision();
+}
+
+/** Reverses the most recent edit. */
+export function undoEdit(): void {
+  const { history } = useAppStore.getState();
+  const last = history.at(-1);
+  if (!last) return;
+  useAppStore.setState({ history: history.slice(0, -1) });
+  applyEdit(invert(last), { record: false });
+}
+
+export function clearLastEdit(): void {
+  useAppStore.setState({ lastEdit: null });
+}
+
+function summarise(edit: EditResult, touched: string[], sources: Source[]): string {
+  const names = touched
+    .map((id) => sources.find((source) => source.id === id)?.name ?? id)
+    .join(", ");
+  return names ? `${edit.description} in ${names}` : edit.description;
 }
 
 /** Test and development helper: drops every source and quad. */
@@ -125,5 +174,7 @@ export function resetStore(): void {
     selectedIri: null,
     revision: 0,
     loadError: null,
+    history: [],
+    lastEdit: null,
   });
 }
