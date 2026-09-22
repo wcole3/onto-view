@@ -44,3 +44,47 @@ export function IconLayout() {
     </svg>
   );
 }
+
+export function IconEye() {
+  return (
+    <svg {...base}>
+      <path d="M1.5 8s2.4-4 6.5-4 6.5 4 6.5 4-2.4 4-6.5 4S1.5 8 1.5 8Z" />
+      <circle cx="8" cy="8" r="1.6" />
+    </svg>
+  );
+}
+
+export function IconEyeOff() {
+  return (
+    <svg {...base}>
+      <path d="M6.2 4.2A6.9 6.9 0 0 1 8 4c4.1 0 6.5 4 6.5 4a12 12 0 0 1-1.9 2.2M9.9 11.8A7 7 0 0 1 8 12c-4.1 0-6.5-4-6.5-4a12 12 0 0 1 2.7-2.8" />
+      <path d="M2.5 2.5l11 11" />
+    </svg>
+  );
+}
+
+export function IconClose() {
+  return (
+    <svg {...base}>
+      <path d="M4 4l8 8M12 4l-8 8" />
+    </svg>
+  );
+}
+
+export function IconSearch() {
+  return (
+    <svg {...base}>
+      <circle cx="7" cy="7" r="4.2" />
+      <path d="M10.2 10.2 13.5 13.5" />
+    </svg>
+  );
+}
+
+export function IconFocus() {
+  return (
+    <svg {...base}>
+      <circle cx="8" cy="8" r="2" />
+      <path d="M8 1.5v2.2M8 12.3v2.2M1.5 8h2.2M12.3 8h2.2" />
+    </svg>
+  );
+}

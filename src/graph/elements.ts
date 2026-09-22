@@ -2,7 +2,8 @@ import type cytoscape from "cytoscape";
 
 import { displayName, iriToCurie } from "../rdf/terms";
 import { DEFAULT_PREFIXES } from "../rdf/vocab";
-import type { Filters, OntologyModel, Source } from "../model/types";
+import type { Filters, OntologyModel, Scope, Source } from "../model/types";
+import { selectScope } from "./subgraph";
 
 /**
  * Provenance state of a node, which selects one of exactly three colour rules
@@ -31,11 +32,18 @@ const HIERARCHY_KINDS = new Set(["subClassOf", "subPropertyOf"]);
  */
 export const READABLE_ELEMENT_LIMIT = 600;
 
-export function toElements(
+export interface Projection {
+  elements: cytoscape.ElementDefinition[];
+  scope: Scope;
+  /** Entities that passed the kind filters, before the scope narrowed them. */
+  candidateCount: number;
+}
+
+export function project(
   model: OntologyModel,
   sources: readonly Source[],
   filters: Filters,
-): cytoscape.ElementDefinition[] {
+): Projection {
   const colorBySource = new Map(sources.map((source) => [source.id, source.color]));
   const prefixes = Object.assign(
     {},
@@ -49,13 +57,21 @@ export function toElements(
     return true;
   };
 
+  // Kind filters first, so the scope's counts describe what the user could
+  // have seen rather than the whole store.
+  const candidates = new Map(
+    [...model.entities].filter(
+      // An ontology header is metadata about the document, not a term in it.
+      ([, entity]) => keep(entity.kind) && entity.kind !== "Ontology",
+    ),
+  );
+  const scope = selectScope(candidates, model.rels, filters);
+
   const nodes: cytoscape.ElementDefinition[] = [];
   const included = new Set<string>();
 
-  for (const entity of model.entities.values()) {
-    if (!keep(entity.kind)) continue;
-    // An ontology header is metadata about the document, not a term in it.
-    if (entity.kind === "Ontology") continue;
+  for (const entity of candidates.values()) {
+    if (scope.keep && !scope.keep.has(entity.iri)) continue;
     included.add(entity.iri);
 
     const declaredCount = entity.declaredIn.length;
@@ -99,7 +115,11 @@ export function toElements(
     });
   }
 
-  return [...nodes, ...edges];
+  return {
+    elements: [...nodes, ...edges],
+    scope: { ...scope, hidden: candidates.size - included.size },
+    candidateCount: candidates.size,
+  };
 }
 
 function relLabel(kind: string): string {

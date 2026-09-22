@@ -1,7 +1,7 @@
 import cytoscape from "cytoscape";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { graphStylesheet, token } from "./style";
+import { EDGE_LABEL_LIMIT, graphStylesheet, token } from "./style";
 
 export type LayoutName = "cose" | "breadthfirst" | "concentric" | "grid";
 
@@ -157,12 +157,29 @@ export function useCytoscape({ elements, onSelect }: UseCytoscapeArgs) {
     if (nodeSetChanged) runLayout();
   }, [elements, ready, runLayout]);
 
+  // Edge labels are re-applied rather than set once, because whether they help
+  // depends on how dense the current graph is.
+  const showEdgeLabels = elements.filter((element) => element.data.source).length <= EDGE_LABEL_LIMIT;
+
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy || !ready) return;
-    cy.style(graphStylesheet());
+    cy.style(graphStylesheet(showEdgeLabels));
     cy.container()?.style.setProperty("background", token("--graph-bg"));
-  }, [ready]);
+  }, [ready, showEdgeLabels]);
 
-  return { containerRef, runLayout, layout, setLayout, cy: cyRef };
+  /** Pans to an entity and selects it, without changing the zoom. */
+  const focusOn = useCallback((id: string) => {
+    const cy = cyRef.current;
+    if (!cy) return;
+    const node = cy.$id(id);
+    if (node.empty()) return;
+    cy.animate({ center: { eles: node } }, { duration: 180 });
+    if (!node.selected()) {
+      cy.elements().unselect();
+      node.select();
+    }
+  }, []);
+
+  return { containerRef, runLayout, layout, setLayout, focusOn, cy: cyRef };
 }

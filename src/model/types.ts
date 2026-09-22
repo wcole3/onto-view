@@ -52,10 +52,33 @@ export interface Filters {
   hideIndividuals: boolean;
   hideTypeEdges: boolean;
   classesOnly: boolean;
+  /** Case-insensitive substring match against label and IRI. */
+  search: string;
+  /** When set, show only this entity's neighbourhood. */
+  focusIri: string | null;
+  /** Hops from the focus entity, following relationships in either direction. */
+  focusDepth: number;
+  /** When set, show only this many levels down from the hierarchy roots. */
+  rootDepth: number | null;
 }
 
 export const DEFAULT_FILTERS: Filters = {
   hideIndividuals: true,
   hideTypeEdges: true,
   classesOnly: false,
+  search: "",
+  focusIri: null,
+  focusDepth: 2,
+  rootDepth: null,
 };
+
+/** How the visible subgraph was chosen, so the UI can say so. */
+export type ScopeKind = "all" | "search" | "focus" | "rootDepth";
+
+export interface Scope {
+  kind: ScopeKind;
+  /** Entities kept, or null for "everything that passed the kind filters". */
+  keep: Set<string> | null;
+  /** Entities dropped by the scope, for reporting. */
+  hidden: number;
+}

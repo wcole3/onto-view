@@ -12,15 +12,30 @@ Under active rewrite. What works today:
 - [x] Tool shell, design tokens, Cytoscape renderer with four layouts
 - [x] Load Turtle, N-Triples, N-Quads, TriG, RDF/XML and JSON-LD, by drop or picker
 - [x] Multiple sources, each with its own colour and provenance state
-- [x] Entity inspector: name, IRI, compact IRI, comment, declaring sources
-- [ ] Source visibility toggles and export
-- [ ] Search, hierarchy filters, layout tuning
+- [x] Entity inspector: name, IRI, compact IRI, comment, declaring sources,
+      broader/narrower/related neighbours as navigable links
+- [x] Search, focus on a neighbourhood, depth limit from the hierarchy roots,
+      kind filters, source visibility toggles
+- [ ] Export to Turtle, N-Triples and JSON-LD
 - [ ] Editing: classes, properties, labels, comments, `subClassOf`, domain/range
 - [ ] Autosave and best-effort RDF/XML export
 
 Tested against real ontologies, not only fixtures: BFO (158 KB RDF/XML, 1,221
 triples) and the merged Common Core Ontologies (2 MB Turtle, 13,875 triples,
 1,701 classes) both load in the browser with a clean console.
+
+## Navigating something the size of CCO
+
+Drawing 1,701 named classes at once produces texture, not structure, so the
+visible subgraph is always narrowed by one of three scopes, and the app reports
+which one is in force and how much it hid:
+
+- **Search** — matches on label or IRI, plus one hop of context
+- **Focus** — one entity and its neighbourhood, to a chosen number of hops
+- **Levels** — the top N levels down from the hierarchy roots
+
+On BFO plus CCO that is the difference between 3,589 elements and 413. Edge
+predicate labels also disappear above 120 edges and come back on selection.
 
 ## Quick start
 

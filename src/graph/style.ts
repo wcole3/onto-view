@@ -44,7 +44,14 @@ export function token(name: string): string {
   return FALLBACKS[name] ?? "";
 }
 
-export function graphStylesheet(): cytoscape.StylesheetJson {
+/**
+ * Above this many edges, predicate labels stop informing and start obscuring:
+ * on BFO plus CCO the domain and range labels tile the whole canvas in grey.
+ * Past the threshold labels appear on selection only.
+ */
+export const EDGE_LABEL_LIMIT = 120;
+
+export function graphStylesheet(showEdgeLabels = true): cytoscape.StylesheetJson {
   return [
     {
       selector: "node",
@@ -120,7 +127,7 @@ export function graphStylesheet(): cytoscape.StylesheetJson {
         "target-arrow-shape": "triangle",
         "arrow-scale": 0.7,
         "curve-style": "bezier",
-        label: "data(label)",
+        label: showEdgeLabels ? "data(label)" : "",
         color: token("--graph-edge-label"),
         "font-family": token("--font-mono"),
         "font-size": token("--text-xs"),

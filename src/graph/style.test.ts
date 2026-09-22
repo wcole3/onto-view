@@ -13,6 +13,28 @@ describe("token", () => {
   });
 });
 
+describe("graphStylesheet edge labels", () => {
+  const labelOf = (sheet: ReturnType<typeof graphStylesheet>) => {
+    const edge = sheet.find((block) => "selector" in block && block.selector === "edge");
+    if (!edge || !("style" in edge)) throw new Error("expected an edge block");
+    return (edge.style as Record<string, unknown>).label;
+  };
+
+  it("labels edges on a sparse graph", () => {
+    expect(labelOf(graphStylesheet(true))).toBe("data(label)");
+  });
+
+  it("drops edge labels on a dense graph, leaving selection to reveal them", () => {
+    expect(labelOf(graphStylesheet(false))).toBe("");
+    const selected = graphStylesheet(false).find(
+      (block) => "selector" in block && block.selector === "edge:selected",
+    );
+    expect(selected && "style" in selected && (selected.style as Record<string, unknown>).label).toBe(
+      "data(label)",
+    );
+  });
+});
+
 describe("graphStylesheet", () => {
   it("styles nodes and edges, with three provenance states", () => {
     const selectors = graphStylesheet().map((block) => ("selector" in block ? block.selector : ""));

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { READABLE_ELEMENT_LIMIT, toElements } from "./elements";
+import { project, READABLE_ELEMENT_LIMIT } from "./elements";
 import { DEFAULT_FILTERS, type Entity, type OntologyModel, type Source } from "../model/types";
 
 function entity(iri: string, partial: Partial<Entity> = {}): Entity {
@@ -28,30 +28,30 @@ function model(entities: Entity[], rels: OntologyModel["rels"] = []): OntologyMo
 
 describe("toElements provenance state", () => {
   it("marks a singly declared entity and gives it that source's colour", () => {
-    const [node] = toElements(
+    const [node] = project(
       model([entity("http://x/A", { declaredIn: ["s1"], mentionedIn: ["s1"] })]),
       SOURCES,
       DEFAULT_FILTERS,
-    );
+    ).elements;
     expect(node.data.state).toBe("single");
     expect(node.data.color).toBe("#1f6c9f");
   });
 
   it("marks an entity declared by two sources as shared", () => {
-    const [node] = toElements(
+    const [node] = project(
       model([entity("http://x/A", { declaredIn: ["s1", "s2"], mentionedIn: ["s1", "s2"] })]),
       SOURCES,
       DEFAULT_FILTERS,
-    );
+    ).elements;
     expect(node.data.state).toBe("shared");
   });
 
   it("marks a referenced but undeclared entity", () => {
-    const [node] = toElements(
+    const [node] = project(
       model([entity("http://x/A", { mentionedIn: ["s2"] })]),
       SOURCES,
       DEFAULT_FILTERS,
-    );
+    ).elements;
     expect(node.data.state).toBe("undeclared");
   });
 });
@@ -65,25 +65,27 @@ describe("toElements filtering", () => {
   ];
 
   it("hides individuals by default", () => {
-    const ids = toElements(model(entities), SOURCES, DEFAULT_FILTERS).map((e) => e.data.id);
+    const ids = project(model(entities), SOURCES, DEFAULT_FILTERS).elements.map(
+      (e) => e.data.id,
+    );
     expect(ids).not.toContain("http://x/i");
     expect(ids).toContain("http://x/p");
   });
 
   it("always omits the ontology header, which is metadata not a term", () => {
-    const ids = toElements(model(entities), SOURCES, {
+    const ids = project(model(entities), SOURCES, {
       ...DEFAULT_FILTERS,
       hideIndividuals: false,
-    }).map((e) => e.data.id);
+    }).elements.map((e) => e.data.id);
     expect(ids).not.toContain("http://x/Onto");
     expect(ids).toContain("http://x/i");
   });
 
   it("keeps only classes when asked", () => {
-    const ids = toElements(model(entities), SOURCES, {
+    const ids = project(model(entities), SOURCES, {
       ...DEFAULT_FILTERS,
       classesOnly: true,
-    }).map((e) => e.data.id);
+    }).elements.map((e) => e.data.id);
     expect(ids).toEqual(["http://x/C"]);
   });
 
@@ -91,7 +93,7 @@ describe("toElements filtering", () => {
     const rels: OntologyModel["rels"] = [
       { id: "r1", from: "http://x/i", to: "http://x/C", kind: "type", sourceId: "s1" },
     ];
-    const elements = toElements(model(entities, rels), SOURCES, {
+    const { elements } = project(model(entities, rels), SOURCES, {
       ...DEFAULT_FILTERS,
       hideTypeEdges: false,
     });
@@ -107,7 +109,7 @@ describe("toElements filtering", () => {
       { id: "r1", from: "http://x/A", to: "http://x/B", kind: "subClassOf", sourceId: "s1" },
       { id: "r2", from: "http://x/A", to: "http://x/B", kind: "subClassOf", sourceId: "s2" },
     ];
-    const edges = toElements(model(shared, rels), SOURCES, DEFAULT_FILTERS).filter(
+    const edges = project(model(shared, rels), SOURCES, DEFAULT_FILTERS).elements.filter(
       (e) => e.data.source,
     );
     expect(edges).toHaveLength(1);
