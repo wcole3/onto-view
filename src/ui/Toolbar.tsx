@@ -1,6 +1,6 @@
 import { FileDrop } from "./FileDrop";
-import { IconGraph, IconLayout, IconSearch, IconUndo } from "./icons";
-import { setFilters, undoEdit, useAppStore } from "../model/store";
+import { IconGraph, IconLayout, IconSearch, IconTree, IconUndo } from "./icons";
+import { setFilters, setView, undoEdit, useAppStore } from "../model/store";
 import type { LayoutName } from "../graph/useCytoscape";
 
 const LAYOUTS: LayoutName[] = ["breadthfirst", "cose", "concentric", "grid"];
@@ -15,6 +15,8 @@ interface ToolbarProps {
 export function Toolbar({ layout, onLayout, onRelayout }: ToolbarProps) {
   const filters = useAppStore((state) => state.filters);
   const hasSources = useAppStore((state) => state.sources.length > 0);
+  // Layout only means something on the canvas; the tree lays itself out.
+  const isGraph = useAppStore((state) => state.view === "graph");
 
   return (
     <header className="toolbar">
@@ -43,6 +45,8 @@ export function Toolbar({ layout, onLayout, onRelayout }: ToolbarProps) {
       <div className="toolbar__spacer" />
 
       <div className="toolbar__group">
+        <ViewToggle />
+
         <label className="field">
           <span className="field__label">Levels</span>
           <select
@@ -72,6 +76,7 @@ export function Toolbar({ layout, onLayout, onRelayout }: ToolbarProps) {
             className="button"
             aria-label="Graph layout"
             value={layout}
+            disabled={!isGraph}
             onChange={(event) => onLayout(event.target.value as LayoutName)}
           >
             {LAYOUTS.map((name) => (
@@ -82,7 +87,7 @@ export function Toolbar({ layout, onLayout, onRelayout }: ToolbarProps) {
           </select>
         </label>
 
-        <button className="button" type="button" onClick={onRelayout} disabled={!hasSources}>
+        <button className="button" type="button" onClick={onRelayout} disabled={!hasSources || !isGraph}>
           Re-layout
         </button>
 
@@ -91,6 +96,37 @@ export function Toolbar({ layout, onLayout, onRelayout }: ToolbarProps) {
         <FileDrop variant="button" />
       </div>
     </header>
+  );
+}
+
+/**
+ * Graph or tree. The two are renderings of one filtered subgraph rather than
+ * two modes, so this switches what the main pane draws and nothing else.
+ */
+function ViewToggle() {
+  const view = useAppStore((state) => state.view);
+
+  return (
+    <div className="segmented" role="group" aria-label="View">
+      <button
+        className="button"
+        type="button"
+        aria-pressed={view === "graph"}
+        onClick={() => setView("graph")}
+      >
+        <IconGraph />
+        Graph
+      </button>
+      <button
+        className="button"
+        type="button"
+        aria-pressed={view === "tree"}
+        onClick={() => setView("tree")}
+      >
+        <IconTree />
+        Tree
+      </button>
+    </div>
   );
 }
 

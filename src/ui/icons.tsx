@@ -114,3 +114,21 @@ export function IconUndo() {
     </svg>
   );
 }
+
+export function IconTree() {
+  return (
+    <svg {...base}>
+      <path d="M3 2.5v9a1 1 0 0 0 1 1h2.5" />
+      <path d="M3 7h3.5" />
+      <path d="M8 1.5h5.5M8 6h5.5M8 11h5.5" />
+    </svg>
+  );
+}
+
+export function IconChevron({ open }: { open: boolean }) {
+  return (
+    <svg {...base} style={{ transform: open ? "rotate(90deg)" : undefined }}>
+      <path d="M6 3.5 10.5 8 6 12.5" />
+    </svg>
+  );
+}

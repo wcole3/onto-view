@@ -72,6 +72,9 @@ export const DEFAULT_FILTERS: Filters = {
   rootDepth: null,
 };
 
+/** Which rendering of the same filtered subgraph the main pane shows. */
+export type ViewName = "graph" | "tree";
+
 /** How the visible subgraph was chosen, so the UI can say so. */
 export type ScopeKind = "all" | "search" | "focus" | "rootDepth";
 

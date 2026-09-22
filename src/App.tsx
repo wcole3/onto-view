@@ -7,6 +7,7 @@ import { Export } from "./ui/Export";
 import { NewEntity } from "./ui/NewEntity";
 import { Autosave } from "./ui/Autosave";
 import { Inspector } from "./ui/Inspector";
+import { TreeView } from "./ui/TreeView";
 import { buildModel } from "./model/ontology";
 import {
   clearLastEdit,
@@ -25,6 +26,7 @@ export default function App() {
   const filters = useAppStore((state) => state.filters);
   const selectedIri = useAppStore((state) => state.selectedIri);
   const loadError = useAppStore((state) => state.loadError);
+  const view = useAppStore((state) => state.view);
   const lastEdit = useAppStore((state) => state.lastEdit);
   const drop = useWindowDrop();
 
@@ -54,8 +56,8 @@ export default function App() {
   // Centre the graph on whatever the inspector is showing, so navigating by
   // neighbour list moves the canvas too.
   useEffect(() => {
-    if (selectedIri) focusOn(selectedIri);
-  }, [selectedIri, focusOn]);
+    if (selectedIri && view === "graph") focusOn(selectedIri);
+  }, [selectedIri, view, focusOn]);
 
   const hasSources = sources.length > 0;
   const overLimit = elements.length > READABLE_ELEMENT_LIMIT;
@@ -91,8 +93,12 @@ export default function App() {
           </div>
         </aside>
 
-        <main className="shell__main">
+        <main className={`shell__main${view === "tree" ? " shell__main--tree" : ""}`}>
+          {/* The canvas stays mounted under the tree rather than unmounting:
+              Cytoscape loses every node position when its container goes, and
+              the end-to-end tests address it through window.__ontoView. */}
           <div className="graph" ref={containerRef} />
+          {view === "tree" ? <TreeView elements={elements} /> : null}
           {hasSources ? null : <FileDrop variant="zone" />}
 
           {loadError ? (
@@ -124,7 +130,7 @@ export default function App() {
                 Show all
               </button>
             </div>
-          ) : overLimit ? (
+          ) : overLimit && view === "graph" ? (
             <div className="banner banner--warning">
               <span>
                 {elements.length.toLocaleString()} elements. Past roughly{" "}

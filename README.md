@@ -10,6 +10,7 @@ whole thing is a static bundle.
 Feature-complete for a first version. What works:
 
 - [x] Tool shell, design tokens, Cytoscape renderer with four layouts
+- [x] Tree view of the hierarchy, over the same filtered subgraph as the graph
 - [x] Load Turtle, N-Triples, N-Quads, TriG, RDF/XML and JSON-LD, by drop or picker
 - [x] Multiple sources, each with its own colour and provenance state
 - [x] Entity inspector: name, IRI, compact IRI, comment, declaring sources,
@@ -38,6 +39,12 @@ which one is in force and how much it hid:
 
 On BFO plus CCO that is the difference between 3,589 elements and 413. Edge
 predicate labels also disappear above 120 edges and come back on selection.
+
+The **Graph / Tree** switch in the top bar changes only how that same subgraph
+is drawn: the tree is an outline of the `subClassOf` and `subPropertyOf` edges
+already on screen, so every filter applies to it unchanged. Branches are walked
+lazily, which matters because the hierarchy is a DAG — a term with several
+parents is listed under each of them.
 
 ## Quick start
 

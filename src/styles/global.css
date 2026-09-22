@@ -690,3 +690,155 @@ select {
   font-size: var(--text-xs);
   color: var(--text-secondary);
 }
+
+/* Tree view — the hierarchy as an outline, over the same filtered subgraph
+   the canvas draws. It sits above the canvas rather than replacing it, so
+   Cytoscape keeps its node positions while the tree is up. */
+.segmented {
+  display: flex;
+}
+.segmented .button {
+  border-radius: 0;
+  margin-left: -1px;
+}
+.segmented .button:first-child {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  margin-left: 0;
+}
+.segmented .button:last-child {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+.segmented .button[aria-pressed="true"] {
+  background: var(--surface-sunken);
+  color: var(--text);
+  border-color: var(--border-strong);
+  z-index: 1;
+}
+/* In tree view the scope banner stops floating over the canvas and takes a
+   row of its own, because an outline is scrolled and read rather than panned:
+   a floating banner would sit on top of the rows the user is reading. */
+.shell__main--tree {
+  display: flex;
+  flex-direction: column;
+}
+.shell__main--tree .banner {
+  position: static;
+  order: -1;
+  margin: var(--space-3) var(--space-3) 0;
+}
+.shell__main--tree .tree {
+  position: relative;
+  inset: auto;
+  flex: 1;
+  min-height: 0;
+}
+.tree {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-canvas);
+  overflow: hidden;
+}
+.tree__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: var(--border-width) solid var(--border);
+  background: var(--surface-raised);
+}
+.tree__count {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+.tree__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+.tree__list {
+  flex: 1;
+  margin: 0;
+  padding: var(--space-2) var(--space-3) var(--space-5);
+  overflow: auto;
+}
+.tree__list ul {
+  margin: 0;
+  padding: 0;
+}
+.tree__list,
+.tree__list ul {
+  list-style: none;
+}
+.tree__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 24px;
+  border-radius: var(--radius-sm);
+}
+.tree__row:hover {
+  background: var(--surface-hover);
+}
+.tree__row--selected {
+  background: var(--accent-blue-bg);
+}
+.tree__toggle {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+.tree__toggle svg {
+  transition: transform var(--duration) var(--ease);
+}
+.tree__toggle:hover {
+  color: var(--text);
+}
+.tree__toggle--leaf {
+  pointer-events: none;
+}
+.tree__label {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: 0 var(--space-1);
+  background: none;
+  border: none;
+  text-align: left;
+  color: var(--text);
+  font-size: var(--text-base);
+  line-height: var(--leading-tight);
+}
+.tree__swatch {
+  flex: none;
+  align-self: center;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.tree__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tree__curie {
+  flex: none;
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+.tree__row .tag {
+  flex: none;
+  margin-right: var(--space-2);
+}

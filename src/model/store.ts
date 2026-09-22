@@ -4,7 +4,7 @@ import { create } from "zustand";
 
 import { SOURCE_COLORS } from "../graph/palette";
 import { affectedGraphs, invert, type EditResult } from "./edits";
-import { DEFAULT_FILTERS, type Filters, type Source } from "./types";
+import { DEFAULT_FILTERS, type Filters, type Source, type ViewName } from "./types";
 
 /**
  * The quad store lives outside React.
@@ -26,6 +26,8 @@ interface AppState {
   activeSourceId: string | null;
   selectedIri: string | null;
   filters: Filters;
+  /** Which rendering of the filtered subgraph the main pane shows. */
+  view: ViewName;
   /** Incremented by every mutation of the quad store. */
   revision: number;
   loadError: string | null;
@@ -40,6 +42,7 @@ export const useAppStore = create<AppState>(() => ({
   activeSourceId: null,
   selectedIri: null,
   filters: DEFAULT_FILTERS,
+  view: "graph",
   revision: 0,
   loadError: null,
   history: [],
@@ -129,6 +132,10 @@ export function setFilters(partial: Partial<Filters>): void {
   useAppStore.setState((state) => ({ filters: { ...state.filters, ...partial } }));
 }
 
+export function setView(view: ViewName): void {
+  useAppStore.setState({ view });
+}
+
 export function setLoadError(message: string | null): void {
   useAppStore.setState({ loadError: message });
 }
@@ -192,6 +199,7 @@ export function resetStore(): void {
     sources: [],
     activeSourceId: null,
     selectedIri: null,
+    view: "graph",
     revision: 0,
     loadError: null,
     history: [],
