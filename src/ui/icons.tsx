@@ -132,3 +132,11 @@ export function IconChevron({ open }: { open: boolean }) {
     </svg>
   );
 }
+
+export function IconCaret({ direction }: { direction: "left" | "right" }) {
+  return (
+    <svg {...base} style={{ transform: direction === "left" ? "rotate(180deg)" : undefined }}>
+      <path d="M6 3.5 10.5 8 6 12.5" />
+    </svg>
+  );
+}

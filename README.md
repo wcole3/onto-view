@@ -11,6 +11,7 @@ Feature-complete for a first version. What works:
 
 - [x] Tool shell, design tokens, Cytoscape renderer with four layouts
 - [x] Tree view of the hierarchy, over the same filtered subgraph as the graph
+- [x] Side panels drag to a width, collapse to a rail, and remember both
 - [x] Load Turtle, N-Triples, N-Quads, TriG, RDF/XML and JSON-LD, by drop or picker
 - [x] Multiple sources, each with its own colour and provenance state
 - [x] Entity inspector: name, IRI, compact IRI, comment, declaring sources,

@@ -7,6 +7,8 @@ import { Export } from "./ui/Export";
 import { NewEntity } from "./ui/NewEntity";
 import { Autosave } from "./ui/Autosave";
 import { Inspector } from "./ui/Inspector";
+import { SidePanel } from "./ui/SidePanel";
+import { columnWidth, usePanelLayout } from "./ui/panelLayout";
 import { TreeView } from "./ui/TreeView";
 import { buildModel } from "./model/ontology";
 import {
@@ -29,6 +31,7 @@ export default function App() {
   const view = useAppStore((state) => state.view);
   const lastEdit = useAppStore((state) => state.lastEdit);
   const drop = useWindowDrop();
+  const panels = usePanelLayout();
 
   const visibleSourceIds = useMemo(
     () => new Set(sources.filter((source) => source.visible).map((source) => source.id)),
@@ -78,20 +81,23 @@ export default function App() {
         onRelayout={() => runLayout()}
       />
 
-      <div className="shell__body">
-        <aside className="panel panel--left">
-          <div className="panel__header">
-            <h2 className="panel__title">Sources</h2>
-            {hasSources ? <span className="tag">{sources.length}</span> : null}
-          </div>
-          <div className="panel__body">
-            <SourceList />
-            {hasSources ? <NewEntity /> : null}
-            {hasSources ? <FilterControls /> : null}
-            {hasSources ? <Export /> : null}
-            <Autosave />
-          </div>
-        </aside>
+      <div
+        className="shell__body"
+        style={{
+          gridTemplateColumns: `${columnWidth(panels, "left")}px 1fr ${columnWidth(panels, "right")}px`,
+        }}
+      >
+        <SidePanel
+          side="left"
+          title="Sources"
+          tag={hasSources ? <span className="tag">{sources.length}</span> : null}
+        >
+          <SourceList />
+          {hasSources ? <NewEntity /> : null}
+          {hasSources ? <FilterControls /> : null}
+          {hasSources ? <Export /> : null}
+          <Autosave />
+        </SidePanel>
 
         <main className={`shell__main${view === "tree" ? " shell__main--tree" : ""}`}>
           {/* The canvas stays mounted under the tree rather than unmounting:
@@ -144,17 +150,17 @@ export default function App() {
           ) : null}
         </main>
 
-        <aside className="panel panel--right">
-          <div className="panel__header">
-            <h2 className="panel__title">Inspector</h2>
-            {selectedIri ? (
+        <SidePanel
+          side="right"
+          title="Inspector"
+          tag={
+            selectedIri ? (
               <span className="tag">{model.entities.get(selectedIri)?.kind ?? "unknown"}</span>
-            ) : null}
-          </div>
-          <div className="panel__body">
-            <Inspector model={model} />
-          </div>
-        </aside>
+            ) : null
+          }
+        >
+          <Inspector model={model} />
+        </SidePanel>
       </div>
     </div>
   );

@@ -52,7 +52,18 @@ select {
 
 .shell__body {
   display: grid;
+  /* Column widths are set inline from the saved panel layout; these are the
+     values used before that state mounts. */
   grid-template-columns: var(--sidebar-width) 1fr var(--inspector-width);
+  min-height: 0;
+}
+
+/* A slot owns the column. The panel inside it scrolls; the drag handle sits on
+   the slot's edge so it cannot scroll out of reach with the content. */
+.panel-slot {
+  position: relative;
+  display: flex;
+  min-width: 0;
   min-height: 0;
 }
 
@@ -108,12 +119,88 @@ select {
   background: var(--surface-raised);
 }
 
-.panel--left {
+.panel {
+  flex: 1;
+  min-width: 0;
+}
+
+.panel--left,
+.panel-slot--left .panel--rail {
   border-right: var(--border-width) solid var(--border);
 }
 
-.panel--right {
+.panel--right,
+.panel-slot--right .panel--rail {
   border-left: var(--border-width) solid var(--border);
+}
+
+/* Collapsed: a rail wide enough for the reopen control and a vertical title. */
+.panel--rail {
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+  overflow: hidden;
+}
+
+.panel__rail-title {
+  writing-mode: vertical-rl;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.panel-slot--right .panel__rail-title {
+  rotate: 180deg;
+}
+
+.panel__header-end {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/*
+ * The drag handle. Four pixels wide with a wider hit area than its visible
+ * line, because a 1px divider is a target nobody can hit.
+ */
+.resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 9px;
+  z-index: 2;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.panel-slot--left .resizer {
+  right: -4px;
+}
+
+.panel-slot--right .resizer {
+  left: -4px;
+}
+
+.resizer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 4px;
+  width: var(--border-width);
+  background: transparent;
+  transition: background var(--duration) var(--ease);
+}
+
+.resizer:hover::after,
+.resizer:focus-visible::after {
+  background: var(--graph-selected);
+}
+
+.resizer:focus-visible {
+  outline: none;
 }
 
 .panel__header {

@@ -114,6 +114,19 @@ export function useCytoscape({ elements, onSelect }: UseCytoscapeArgs) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Cytoscape sizes its canvas to the container and only listens for window
+  // resizes, so dragging a side panel would otherwise leave the drawing
+  // stretched until the next window resize.
+  useEffect(() => {
+    const cy = cyRef.current;
+    const container = containerRef.current;
+    if (!cy || !ready || !container) return;
+
+    const observer = new ResizeObserver(() => cy.resize());
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [ready]);
+
   useEffect(() => {
     const cy = cyRef.current;
     if (!cy || !ready) return;
