@@ -11,7 +11,7 @@ import { download, MIME_TYPES } from "../persist/download";
 import { quadStore, setLoadError, useAppStore } from "../model/store";
 import { IconDownload } from "./icons";
 
-const FORMATS: WriteFormat[] = ["turtle", "ntriples", "nquads", "jsonld"];
+const FORMATS: WriteFormat[] = ["turtle", "ntriples", "nquads", "jsonld", "rdfxml"];
 
 /** "all visible sources merged", or one source's id. */
 type Scope = "visible" | string;
@@ -101,6 +101,15 @@ export function Export() {
         <IconDownload />
         {busy ? "Preparing" : "Download"}
       </button>
+
+      {format === "rdfxml" ? (
+        <p className="autosave__warn">
+          No RDF/XML serialiser exists for JavaScript, so this one is
+          hand-written: valid XML in the striped <code>rdf:Description</code>
+          form, but not the compact idiomatic shape a dedicated tool produces.
+          Turtle is the recommended export format.
+        </p>
+      ) : null}
 
       <p className="panel__empty">
         {format === "nquads"

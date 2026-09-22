@@ -14,5 +14,8 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["./src/test/setup.ts"],
+    // Unit tests colocate with their code. Without this, Vitest's default
+    // globs also collect the Playwright specs in e2e/, which need a browser.
+    include: ["src/**/*.test.{ts,tsx}"],
   },
 });

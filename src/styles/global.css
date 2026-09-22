@@ -185,7 +185,7 @@ select {
 }
 
 .button--primary:hover {
-  background: #333333;
+  background: var(--text-hover);
 }
 
 .tag {
@@ -393,6 +393,10 @@ select {
 .search:focus-within {
   border-color: var(--graph-selected);
   color: var(--text);
+  /* The input itself has no outline, so the ring goes on the wrapper. Without
+     this the search box is the one control with no visible focus state. */
+  outline: 2px solid var(--graph-selected);
+  outline-offset: 1px;
 }
 
 .search__input {
@@ -537,6 +541,14 @@ select {
   cursor: pointer;
 }
 
+/* The active-source radio is visually hidden, so focus has to show on the
+   name beside it or keyboard users cannot see where they are. */
+.sources__name:has(input:focus-visible) span {
+  outline: 2px solid var(--graph-selected);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 .sources__meta {
   grid-column: 1 / -1;
 }
@@ -644,4 +656,35 @@ select {
 
 .toolbar .tag {
   background: var(--surface-sunken);
+}
+
+/* ---------- Autosave ---------- */
+
+.autosave {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--border);
+  font-size: var(--text-xs);
+}
+
+.autosave__note,
+.autosave__warn {
+  margin: 0 0 var(--space-1);
+  line-height: var(--leading-tight);
+}
+
+.autosave__note {
+  color: var(--text-secondary);
+}
+
+.autosave__warn {
+  padding: var(--space-2);
+  background: var(--accent-yellow-bg);
+  color: var(--accent-yellow-fg);
+  border-radius: var(--radius-sm);
+}
+
+.autosave .link {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
 }

@@ -20,6 +20,7 @@
 
   /* Text — never pure black */
   --text: #111111;
+  --text-hover: #333333;
   --text-secondary: #787774;
   --text-inverse: #ffffff;
 

@@ -75,6 +75,26 @@ export function addSource(source: Omit<Source, "color" | "visible">, parsed: RDF
   bumpRevision();
 }
 
+/**
+ * Reinstates a saved session. Source ids, colours and visibility come back
+ * unchanged, because the ids are the graph terms the restored quads carry.
+ */
+export function restoreSources(sources: Source[], parsed: RDF.Quad[]): void {
+  quads.addQuads(parsed);
+  // Keep minting ids above anything restored, so a newly loaded file cannot
+  // collide with a restored source's graph.
+  sourceCounter = Math.max(
+    sourceCounter,
+    ...sources.map((source) => Number(source.id.split(":").pop()) || 0),
+  );
+  useAppStore.setState({
+    sources,
+    activeSourceId: sources.at(-1)?.id ?? null,
+    loadError: null,
+  });
+  bumpRevision();
+}
+
 export function removeSource(id: string): void {
   quads.deleteGraph(id);
   useAppStore.setState((state) => {

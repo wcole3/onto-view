@@ -4,6 +4,7 @@ import { displayName, iriToCurie } from "../rdf/terms";
 import { DEFAULT_PREFIXES } from "../rdf/vocab";
 import type { Filters, OntologyModel, Scope, Source } from "../model/types";
 import { selectScope } from "./subgraph";
+import { token } from "./style";
 
 /**
  * Provenance state of a node, which selects one of exactly three colour rules
@@ -86,7 +87,9 @@ export function project(
         curie: iriToCurie(entity.iri, prefixes),
         kind: entity.kind,
         state,
-        color: colorBySource.get(owner ?? "") ?? "#5c6470",
+        // Falls back to the neutral node border when an entity's only source
+        // is gone, which happens briefly between a removal and a rebuild.
+        color: colorBySource.get(owner ?? "") ?? token("--graph-node-border"),
       },
     });
   }
@@ -110,7 +113,7 @@ export function project(
         label: relLabel(rel.kind),
         kind: rel.kind,
         hierarchy: HIERARCHY_KINDS.has(rel.kind),
-        color: colorBySource.get(rel.sourceId) ?? "#c9c9c6",
+        color: colorBySource.get(rel.sourceId) ?? token("--graph-edge"),
       },
     });
   }

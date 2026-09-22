@@ -7,7 +7,7 @@ whole thing is a static bundle.
 
 ## Status
 
-Under active rewrite. What works today:
+Feature-complete for a first version. What works:
 
 - [x] Tool shell, design tokens, Cytoscape renderer with four layouts
 - [x] Load Turtle, N-Triples, N-Quads, TriG, RDF/XML and JSON-LD, by drop or picker
@@ -19,7 +19,8 @@ Under active rewrite. What works today:
 - [x] Export to Turtle, N-Triples, N-Quads and JSON-LD, per source or merged
 - [x] Editing: create, rename and delete entities; edit labels and comments;
       add and remove `subClassOf`, `domain` and `range`; undo
-- [ ] Autosave and best-effort RDF/XML export
+- [x] Autosave to IndexedDB, restored on reload
+- [x] Best-effort RDF/XML export
 
 Tested against real ontologies, not only fixtures: BFO (158 KB RDF/XML, 1,221
 triples) and the merged Common Core Ontologies (2 MB Turtle, 13,875 triples,
@@ -59,17 +60,18 @@ Other scripts: `bun run build`, `bun run preview`, `bun run test`,
 | TriG | yes | read only |
 | JSON-LD (local `@context`) | yes | yes |
 | JSON-LD (remote `@context`) | fetched if CORS allows | — |
-| RDF/XML | yes | best-effort only |
+| RDF/XML | yes | best effort |
 | OWL in any of the above | yes | as above |
 
 Exports declare only the prefixes a document actually uses, and the provenance
 graph term is dropped — except in N-Quads, where asking for the format is
 asking to keep the graph column.
 
-RDF/XML is read-only in practice: no RDF/XML serializer exists for JavaScript,
-so writing it means a hand-rolled best-effort emitter that covers the striped
-`rdf:Description` form and nothing more. **Turtle is the recommended export
-format.**
+No RDF/XML serialiser exists for JavaScript, so the one here is hand-written.
+It emits valid, reparseable XML in the striped `rdf:Description` form, but not
+the compact idiomatic shape a dedicated tool produces, and a predicate whose
+local part is not a valid XML name is reported rather than written. **Turtle is
+the recommended export format.**
 
 ## How editing behaves
 
@@ -108,6 +110,28 @@ Cytoscape element list is derived from that model and then *diffed and patched*
 into the renderer, because replacing elements outright would discard every node
 position. Provenance is free: each quad's graph term is its source id, which
 drives node colouring and the source toggles.
+
+## Your work is saved in the browser
+
+Edits autosave to IndexedDB shortly after they settle, and the session is
+restored on reload — sources, colours, visibility and all. IndexedDB rather
+than `localStorage`, which holds about 5 MB of UTF-16: CCO alone serialises to
+roughly 2.4 MB of N-Quads and a second source would exceed the quota, and an
+editor that loses work to a caught exception is worse than one that never
+offered to save.
+
+Nothing leaves the browser. "Discard saved copy" removes it.
+
+## Tests
+
+```sh
+bun run test    # 98 unit tests
+bun run e2e     # 17 end-to-end tests, against the production build
+```
+
+The end-to-end suite builds and serves the production bundle itself, because
+several classes of failure appear only there: Node-shim resolution for the
+streaming parsers, asset paths, and code-split chunk loading.
 
 ## Licence
 

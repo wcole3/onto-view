@@ -5,6 +5,7 @@ import { FilterControls, Toolbar } from "./ui/Toolbar";
 import { SourceList } from "./ui/SourceList";
 import { Export } from "./ui/Export";
 import { NewEntity } from "./ui/NewEntity";
+import { Autosave } from "./ui/Autosave";
 import { Inspector } from "./ui/Inspector";
 import { buildModel } from "./model/ontology";
 import {
@@ -86,6 +87,7 @@ export default function App() {
             {hasSources ? <NewEntity /> : null}
             {hasSources ? <FilterControls /> : null}
             {hasSources ? <Export /> : null}
+            <Autosave />
           </div>
         </aside>
 

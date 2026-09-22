@@ -1,18 +1,20 @@
 import { DataFactory, Writer as N3Writer } from "n3";
 import type * as RDF from "@rdfjs/types";
 
+import { writeRdfXml } from "./rdfxmlWriter";
 import { iriToCurie } from "./terms";
 import { DEFAULT_PREFIXES } from "./vocab";
 
 const { quad: makeQuad, defaultGraph } = DataFactory;
 
-export type WriteFormat = "turtle" | "ntriples" | "nquads" | "jsonld";
+export type WriteFormat = "turtle" | "ntriples" | "nquads" | "jsonld" | "rdfxml";
 
 export const WRITE_FORMAT_LABELS: Record<WriteFormat, string> = {
   turtle: "Turtle",
   ntriples: "N-Triples",
   nquads: "N-Quads",
   jsonld: "JSON-LD",
+  rdfxml: "RDF/XML (best effort)",
 };
 
 export const WRITE_FORMAT_EXTENSIONS: Record<WriteFormat, string> = {
@@ -20,6 +22,7 @@ export const WRITE_FORMAT_EXTENSIONS: Record<WriteFormat, string> = {
   ntriples: "nt",
   nquads: "nq",
   jsonld: "jsonld",
+  rdfxml: "rdf",
 };
 
 const N3_FORMATS: Partial<Record<WriteFormat, string>> = {
@@ -69,6 +72,19 @@ function usedPrefixes(
   return used;
 }
 
+/**
+ * Triples an RDF/XML export cannot express, so the UI can say how many before
+ * the user commits to the format.
+ */
+export function rdfXmlLosses(
+  quads: readonly RDF.Quad[],
+  prefixes: Record<string, string> = {},
+): number {
+  const prepared = stripGraph(quads, "rdfxml");
+  return writeRdfXml(prepared, usedPrefixes(prepared, { ...DEFAULT_PREFIXES, ...prefixes }))
+    .skipped.length;
+}
+
 export async function serialize(
   quads: readonly RDF.Quad[],
   format: WriteFormat,
@@ -77,6 +93,7 @@ export async function serialize(
   const prepared = stripGraph(quads, format);
   const context = usedPrefixes(prepared, { ...DEFAULT_PREFIXES, ...prefixes });
   if (format === "jsonld") return writeJsonLd(prepared, context);
+  if (format === "rdfxml") return writeRdfXml(prepared, context).xml;
 
   // Constructing a Writer with no output stream makes it buffer internally and
   // hand back the whole document through end().
