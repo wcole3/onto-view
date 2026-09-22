@@ -3,7 +3,30 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Browser-only viewer and editor for RDF, OWL and LinkML-adjacent ontologies.",
+  "description": "Browser-only viewer and editor for RDF and OWL ontologies. No server.",
+  "license": "MIT",
+  "homepage": "https://wcole3.github.io/onto-view/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wcole3/onto-view.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wcole3/onto-view/issues"
+  },
+  "keywords": [
+    "ontology",
+    "rdf",
+    "owl",
+    "turtle",
+    "rdf-xml",
+    "json-ld",
+    "graph",
+    "visualization",
+    "editor",
+    "bfo",
+    "cco",
+    "linked-data"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

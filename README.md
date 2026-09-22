@@ -5,6 +5,9 @@ files, explore them as an interactive graph, edit the common things, and
 download the result. There is no server and no build step beyond Vite — the
 whole thing is a static bundle.
 
+**[Try it](https://wcole3.github.io/onto-view/)** — the demo is the whole
+application. Your files are parsed in the tab and never uploaded.
+
 ## Status
 
 Feature-complete for a first version. What works:
@@ -133,14 +136,33 @@ Nothing leaves the browser. "Discard saved copy" removes it.
 ## Tests
 
 ```sh
-bun run test    # 98 unit tests
-bun run e2e     # 17 end-to-end tests, against the production build
+bun run test    # 119 unit tests
+bun run e2e     #  24 end-to-end tests, against the production build
 ```
 
 The end-to-end suite builds and serves the production bundle itself, because
 several classes of failure appear only there: Node-shim resolution for the
 streaming parsers, asset paths, and code-split chunk loading.
 
+## Deploying
+
+The app is a static bundle, so any static host will serve it. The included
+workflow publishes to GitHub Pages on every push to `main`.
+
+A project page is served from `https://<user>.github.io/<repo>/`, so the build
+needs to know that path or every asset 404s against the domain root. The
+workflow sets `VITE_BASE` from the repository name; local dev, preview and the
+end-to-end suite all serve from `/` and use the default.
+
+Publishing needs one manual step that no workflow can do for you:
+**Settings → Pages → Source → GitHub Actions**. Without it the workflow
+succeeds and nothing is published.
+
 ## Licence
 
-Not yet chosen.
+[MIT](LICENSE). Copyright 2026 wcole3.
+
+The sample ontology in `public/samples/` is hand-written for this repository.
+No third-party ontology is redistributed here; BFO and the Common Core
+Ontologies are referenced in the documentation and fetched by the developer,
+not vendored.
