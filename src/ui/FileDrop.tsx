@@ -72,6 +72,10 @@ export function FileDrop({ variant }: FileDropProps) {
       <input
         ref={inputRef}
         className="visually-hidden"
+        // The visible button is the control; without this the hidden input
+        // also surfaces as a "Choose File" button to assistive technology.
+        aria-hidden
+        tabIndex={-1}
         type="file"
         multiple
         accept=".ttl,.turtle,.n3,.nt,.nq,.trig,.rdf,.owl,.xml,.jsonld,.json"

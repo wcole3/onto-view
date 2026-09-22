@@ -545,3 +545,25 @@ select {
   background: var(--surface-raised);
   color: var(--text-secondary);
 }
+
+/* ---------- Export ---------- */
+
+.checks--export {
+  gap: var(--space-3);
+}
+
+.field--stacked {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-1);
+}
+
+.checks--export .button {
+  width: 100%;
+  justify-content: center;
+}
+
+.checks--export .panel__empty {
+  margin: 0;
+  font-size: var(--text-xs);
+}

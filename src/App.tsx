@@ -3,6 +3,7 @@ import { useEffect, useMemo } from "react";
 import { FileDrop, useWindowDrop } from "./ui/FileDrop";
 import { FilterControls, Toolbar } from "./ui/Toolbar";
 import { SourceList } from "./ui/SourceList";
+import { Export } from "./ui/Export";
 import { Inspector } from "./ui/Inspector";
 import { buildModel } from "./model/ontology";
 import {
@@ -80,6 +81,7 @@ export default function App() {
           <div className="panel__body">
             <SourceList />
             {hasSources ? <FilterControls /> : null}
+            {hasSources ? <Export /> : null}
           </div>
         </aside>
 

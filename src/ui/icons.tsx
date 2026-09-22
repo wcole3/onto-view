@@ -88,3 +88,12 @@ export function IconFocus() {
     </svg>
   );
 }
+
+export function IconDownload() {
+  return (
+    <svg {...base}>
+      <path d="M8 2.5v8M5 7.5 8 10.5l3-3" />
+      <path d="M2.5 11v1.5a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V11" />
+    </svg>
+  );
+}

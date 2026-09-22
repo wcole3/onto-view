@@ -16,7 +16,7 @@ Under active rewrite. What works today:
       broader/narrower/related neighbours as navigable links
 - [x] Search, focus on a neighbourhood, depth limit from the hierarchy roots,
       kind filters, source visibility toggles
-- [ ] Export to Turtle, N-Triples and JSON-LD
+- [x] Export to Turtle, N-Triples, N-Quads and JSON-LD, per source or merged
 - [ ] Editing: classes, properties, labels, comments, `subClassOf`, domain/range
 - [ ] Autosave and best-effort RDF/XML export
 
@@ -53,13 +53,17 @@ Other scripts: `bun run build`, `bun run preview`, `bun run test`,
 
 | Format | Read | Write |
 |---|---|---|
-| Turtle | yes | planned |
-| N-Triples / N-Quads | yes | planned |
-| TriG | yes | planned |
-| JSON-LD (local `@context`) | yes | planned |
+| Turtle | yes | yes |
+| N-Triples / N-Quads | yes | yes |
+| TriG | yes | read only |
+| JSON-LD (local `@context`) | yes | yes |
 | JSON-LD (remote `@context`) | fetched if CORS allows | — |
 | RDF/XML | yes | best-effort only |
 | OWL in any of the above | yes | as above |
+
+Exports declare only the prefixes a document actually uses, and the provenance
+graph term is dropped — except in N-Quads, where asking for the format is
+asking to keep the graph column.
 
 RDF/XML is read-only in practice: no RDF/XML serializer exists for JavaScript,
 so writing it means a hand-rolled best-effort emitter that covers the striped
