@@ -4,7 +4,13 @@ import { setFilters, setView, undoEdit, useAppStore } from "../model/store";
 import type { LayoutName } from "../graph/useCytoscape";
 
 const LAYOUTS: LayoutName[] = ["breadthfirst", "cose", "concentric", "grid"];
-const ROOT_DEPTHS = [1, 2, 3, 4] as const;
+/**
+ * Depth limits offered by the Levels filter. The default is "all": a depth is
+ * a way out of a hairball, not something to impose up front. Ten covers real
+ * hierarchies — BFO bottoms out around six levels and CCO around nine — so the
+ * list stops where a deeper limit would be indistinguishable from all.
+ */
+const ROOT_DEPTHS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
 
 interface ToolbarProps {
   layout: LayoutName;
