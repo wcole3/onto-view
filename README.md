@@ -27,8 +27,8 @@ Feature-complete for a first version. What works:
 - [x] Autosave to IndexedDB, restored on reload
 - [x] Best-effort RDF/XML export
 
-Tested against real ontologies, not only fixtures: BFO (158 KB RDF/XML, 1,221
-triples) and the merged Common Core Ontologies (2 MB Turtle, 13,875 triples,
+Tested against real ontologies, not only fixtures: [BFO](https://github.com/BFO-ontology/BFO-2020/releases) (158 KB RDF/XML, 1,221
+triples) and the merged [Common Core Ontologies](https://github.com/CommonCoreOntology/CommonCoreOntologies/releases) (2 MB Turtle, 13,875 triples,
 1,701 classes) both load in the browser with a clean console.
 
 ## Navigating something the size of CCO
