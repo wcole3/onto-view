@@ -5,6 +5,10 @@ import { graphStylesheet, token } from "./style";
 
 export type LayoutName = "cose" | "breadthfirst" | "concentric" | "grid";
 
+/** Below this, node labels stop being legible; above it, they look oversized. */
+const MIN_READABLE_ZOOM = 0.55;
+const MAX_FIT_ZOOM = 1;
+
 /**
  * Hierarchy edges point from the more specific term to the more general one
  * (`rdfs:subClassOf` reads "subject is a subclass of object"), which is the
@@ -35,7 +39,6 @@ function layoutOptions(name: LayoutName, cy: cytoscape.Core): cytoscape.LayoutOp
 
 interface UseCytoscapeArgs {
   elements: cytoscape.ElementDefinition[];
-  layout: LayoutName;
   onSelect?: (id: string | null) => void;
 }
 
@@ -48,11 +51,12 @@ interface UseCytoscapeArgs {
  * graph of any size. A layout therefore runs only when the set of node ids
  * changes, never on a pure data change such as editing a label.
  */
-export function useCytoscape({ elements, layout, onSelect }: UseCytoscapeArgs) {
+export function useCytoscape({ elements, onSelect }: UseCytoscapeArgs) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const cyRef = useRef<cytoscape.Core | null>(null);
   const hashesRef = useRef(new Map<string, string>());
   const [ready, setReady] = useState(false);
+  const [layout, setLayout] = useState<LayoutName>("breadthfirst");
 
   const runLayout = useCallback(
     (name?: LayoutName) => {
@@ -60,10 +64,14 @@ export function useCytoscape({ elements, layout, onSelect }: UseCytoscapeArgs) {
       if (!cy || cy.elements().length === 0) return;
       cy.layout(layoutOptions(name ?? layout, cy)).run();
       cy.fit(undefined, 40);
-      // Fitting a small graph to a large canvas magnifies it until the nodes
-      // look sparse and the type looks oversized. Cap at natural scale.
-      if (cy.zoom() > 1) {
-        cy.zoom(1);
+      // Fitting is only a starting point, and on its own it produces two bad
+      // results: a small graph is magnified until the type looks oversized, and
+      // a wide one is shrunk until the labels are illegible texture. BFO alone
+      // has around two dozen hierarchy roots, so a plain fit lands near 0.35.
+      // Clamp to a readable band and let the user pan for the rest.
+      const zoom = cy.zoom();
+      if (zoom > MAX_FIT_ZOOM || zoom < MIN_READABLE_ZOOM) {
+        cy.zoom(Math.min(MAX_FIT_ZOOM, Math.max(MIN_READABLE_ZOOM, zoom)));
         cy.center();
       }
     },
@@ -156,5 +164,5 @@ export function useCytoscape({ elements, layout, onSelect }: UseCytoscapeArgs) {
     cy.container()?.style.setProperty("background", token("--graph-bg"));
   }, [ready]);
 
-  return { containerRef, runLayout, cy: cyRef };
+  return { containerRef, runLayout, layout, setLayout, cy: cyRef };
 }

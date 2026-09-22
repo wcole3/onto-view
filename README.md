@@ -10,15 +10,17 @@ whole thing is a static bundle.
 Under active rewrite. What works today:
 
 - [x] Tool shell, design tokens, Cytoscape renderer with four layouts
-- [ ] Load Turtle, N-Triples, JSON-LD and RDF/XML files
-- [ ] Multiple sources with per-source colours and visibility toggles
-- [ ] Export to Turtle, N-Triples and JSON-LD
-- [ ] Entity inspector
+- [x] Load Turtle, N-Triples, N-Quads, TriG, RDF/XML and JSON-LD, by drop or picker
+- [x] Multiple sources, each with its own colour and provenance state
+- [x] Entity inspector: name, IRI, compact IRI, comment, declaring sources
+- [ ] Source visibility toggles and export
+- [ ] Search, hierarchy filters, layout tuning
 - [ ] Editing: classes, properties, labels, comments, `subClassOf`, domain/range
 - [ ] Autosave and best-effort RDF/XML export
 
-The graph currently shown is a fixed fragment of the BFO continuant hierarchy,
-there to exercise the renderer until file loading lands.
+Tested against real ontologies, not only fixtures: BFO (158 KB RDF/XML, 1,221
+triples) and the merged Common Core Ontologies (2 MB Turtle, 13,875 triples,
+1,701 classes) both load in the browser with a clean console.
 
 ## Quick start
 
@@ -32,17 +34,17 @@ bun run dev
 Other scripts: `bun run build`, `bun run preview`, `bun run test`,
 `bun run lint`, `bun run typecheck`.
 
-## Planned format support
+## Format support
 
 | Format | Read | Write |
 |---|---|---|
-| Turtle | planned | planned |
-| N-Triples / N-Quads | planned | planned |
-| TriG | planned | planned |
-| JSON-LD (local `@context`) | planned | planned |
+| Turtle | yes | planned |
+| N-Triples / N-Quads | yes | planned |
+| TriG | yes | planned |
+| JSON-LD (local `@context`) | yes | planned |
 | JSON-LD (remote `@context`) | fetched if CORS allows | — |
-| RDF/XML | planned | best-effort only |
-| OWL in any of the above | planned | as above |
+| RDF/XML | yes | best-effort only |
+| OWL in any of the above | yes | as above |
 
 RDF/XML is read-only in practice: no RDF/XML serializer exists for JavaScript,
 so writing it means a hand-rolled best-effort emitter that covers the striped
@@ -56,6 +58,11 @@ format.**
 - No `owl:imports` resolution over the network.
 - No LinkML support. See [docs/ontology-viewer.md](docs/ontology-viewer.md) for
   why LinkML is a poor canonical representation for arbitrary OWL.
+- Blank nodes are not drawn. They carry OWL class expressions and RDF list
+  plumbing, which turn a node-link view into a hairball; the axioms that
+  reference them stay visible, their anonymous interior does not.
+- Named graphs inside a TriG or JSON-LD document are flattened into the file's
+  source graph, because the graph term is used to carry provenance.
 
 ## Architecture in one paragraph
 

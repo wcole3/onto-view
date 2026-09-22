@@ -5,6 +5,16 @@ import type cytoscape from "cytoscape";
  * style the DOM chrome (src/styles/tokens.css), so the canvas cannot drift away
  * from the rest of the UI. Fallbacks exist only for environments with no
  * computed style, such as jsdom under Vitest.
+ *
+ * Two visual channels, kept independent:
+ *
+ * - **shape** encodes what kind of thing a node is
+ * - **border colour** encodes which source declares it
+ *
+ * Provenance is carried by the border rather than the fill. The source palette
+ * is mid-dark so that it stays separable at small sizes, and filling nodes with
+ * it would both shout on a bone canvas and force white label text. A 2.5px
+ * border reads clearly while leaving labels in off-black.
  */
 
 const FALLBACKS: Record<string, string> = {
@@ -58,13 +68,49 @@ export function graphStylesheet(): cytoscape.StylesheetJson {
         "text-wrap": "none",
       },
     },
+
+    // Shape by entity kind.
+    { selector: 'node[kind = "ObjectProperty"]', style: { shape: "round-diamond", height: 34 } },
+    { selector: 'node[kind = "DatatypeProperty"]', style: { shape: "round-tag", height: 30 } },
+    { selector: 'node[kind = "AnnotationProperty"]', style: { shape: "round-tag", height: 30 } },
+    { selector: 'node[kind = "Property"]', style: { shape: "round-tag", height: 30 } },
+    { selector: 'node[kind = "Individual"]', style: { shape: "ellipse", height: 30 } },
+
+    // Border colour by provenance. Exactly three states.
+    {
+      selector: 'node[state = "single"]',
+      style: { "border-color": "data(color)", "border-width": 2.5 },
+    },
+    {
+      selector: 'node[state = "shared"]',
+      style: {
+        "background-color": token("--graph-node-shared-fill"),
+        "border-color": "data(color)",
+        "border-width": 2.5,
+      },
+    },
+    {
+      // Referenced but never declared in anything loaded — typically a class
+      // from an ontology that was imported but not opened.
+      selector: 'node[state = "undeclared"]',
+      style: {
+        "background-color": token("--graph-node-fill"),
+        "border-color": token("--graph-node-border"),
+        "border-width": 1,
+        "border-style": "dashed",
+        color: token("--graph-edge-label"),
+      },
+    },
+
     {
       selector: "node:selected",
       style: {
         "border-color": token("--graph-selected"),
-        "border-width": 2,
+        "border-width": 3,
+        "border-style": "solid",
       },
     },
+
     {
       selector: "edge",
       style: {
@@ -87,7 +133,7 @@ export function graphStylesheet(): cytoscape.StylesheetJson {
       // A hierarchy arrow already says "subClassOf", so labelling every one of
       // them is noise that collides on parallel edges. The label comes back on
       // selection, where it is actually being read.
-      selector: 'edge[kind = "subClassOf"]',
+      selector: "edge[?hierarchy]",
       style: { label: "" },
     },
     {

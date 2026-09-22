@@ -14,14 +14,17 @@ describe("token", () => {
 });
 
 describe("graphStylesheet", () => {
-  it("styles nodes and edges in both states", () => {
+  it("styles nodes and edges, with three provenance states", () => {
     const selectors = graphStylesheet().map((block) => ("selector" in block ? block.selector : ""));
-    expect(selectors).toEqual([
-      "node",
-      "node:selected",
-      "edge",
-      'edge[kind = "subClassOf"]',
-      "edge:selected",
+    expect(selectors).toContain("node");
+    expect(selectors).toContain("edge");
+    expect(selectors).toContain("node:selected");
+    expect(selectors).toContain("edge:selected");
+    // The three provenance states, and nothing more elaborate.
+    expect(selectors.filter((s) => s.includes("state ="))).toEqual([
+      'node[state = "single"]',
+      'node[state = "shared"]',
+      'node[state = "undeclared"]',
     ]);
   });
 

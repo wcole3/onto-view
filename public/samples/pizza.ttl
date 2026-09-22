@@ -1,0 +1,86 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix pizza: <http://example.org/pizza#> .
+
+pizza: a owl:Ontology ;
+    rdfs:label "Pizza, a small demonstration ontology" ;
+    rdfs:comment "Hand-written sample used to exercise the viewer. Not a real product ontology." .
+
+### Classes
+
+pizza:Food a owl:Class ;
+    rdfs:label "Food" .
+
+pizza:Pizza a owl:Class ;
+    rdfs:subClassOf pizza:Food ;
+    rdfs:label "Pizza" ;
+    rdfs:comment "A flat bread base with toppings, baked." .
+
+pizza:PizzaBase a owl:Class ;
+    rdfs:subClassOf pizza:Food ;
+    rdfs:label "Pizza base" .
+
+pizza:ThinAndCrispyBase a owl:Class ;
+    rdfs:subClassOf pizza:PizzaBase ;
+    rdfs:label "Thin and crispy base" .
+
+pizza:DeepPanBase a owl:Class ;
+    rdfs:subClassOf pizza:PizzaBase ;
+    rdfs:label "Deep pan base" .
+
+pizza:Topping a owl:Class ;
+    rdfs:subClassOf pizza:Food ;
+    rdfs:label "Topping" .
+
+pizza:CheeseTopping a owl:Class ;
+    rdfs:subClassOf pizza:Topping ;
+    rdfs:label "Cheese topping" .
+
+pizza:Mozzarella a owl:Class ;
+    rdfs:subClassOf pizza:CheeseTopping ;
+    rdfs:label "Mozzarella" .
+
+pizza:VegetableTopping a owl:Class ;
+    rdfs:subClassOf pizza:Topping ;
+    rdfs:label "Vegetable topping" .
+
+pizza:TomatoTopping a owl:Class ;
+    rdfs:subClassOf pizza:VegetableTopping ;
+    rdfs:label "Tomato topping" .
+
+pizza:MushroomTopping a owl:Class ;
+    rdfs:subClassOf pizza:VegetableTopping ;
+    rdfs:label "Mushroom topping" .
+
+pizza:Margherita a owl:Class ;
+    rdfs:subClassOf pizza:Pizza ;
+    rdfs:label "Margherita" ;
+    rdfs:comment "Tomato and mozzarella only." .
+
+pizza:Funghi a owl:Class ;
+    rdfs:subClassOf pizza:Pizza ;
+    rdfs:label "Funghi" .
+
+### Properties
+
+pizza:hasTopping a owl:ObjectProperty ;
+    rdfs:domain pizza:Pizza ;
+    rdfs:range pizza:Topping ;
+    rdfs:label "has topping" .
+
+pizza:hasBase a owl:ObjectProperty ;
+    rdfs:domain pizza:Pizza ;
+    rdfs:range pizza:PizzaBase ;
+    rdfs:label "has base" .
+
+pizza:priceInPence a owl:DatatypeProperty ;
+    rdfs:domain pizza:Pizza ;
+    rdfs:range xsd:integer ;
+    rdfs:label "price in pence" .
+
+### An individual
+
+pizza:margheritaAtLuigis a owl:NamedIndividual, pizza:Margherita ;
+    rdfs:label "The margherita at Luigi's" .
