@@ -155,6 +155,7 @@ select {
   rotate: 180deg;
 }
 
+.panel__header-start,
 .panel__header-end {
   display: flex;
   align-items: center;

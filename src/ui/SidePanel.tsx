@@ -123,11 +123,15 @@ export function SidePanel({ side, title, tag, children }: SidePanelProps) {
   return (
     <div className={`panel-slot panel-slot--${side}`}>
       <aside className={`panel panel--${side}`}>
+        {/* The toggle sits on the header's inner edge, the one facing the canvas. */}
         <div className="panel__header">
-          <h2 className="panel__title">{title}</h2>
+          <div className="panel__header-start">
+            {side === "right" ? toggle : null}
+            <h2 className="panel__title">{title}</h2>
+          </div>
           <div className="panel__header-end">
             {tag}
-            {toggle}
+            {side === "left" ? toggle : null}
           </div>
         </div>
         <div className="panel__body">{children}</div>
