@@ -46,7 +46,7 @@ select {
 
 .shell {
   display: grid;
-  grid-template-rows: var(--toolbar-height) 1fr;
+  grid-template-rows: var(--toolbar-height) minmax(0, 1fr);
   height: 100%;
 }
 
@@ -55,6 +55,10 @@ select {
   /* Column widths are set inline from the saved panel layout; these are the
      values used before that state mounts. */
   grid-template-columns: var(--sidebar-width) 1fr var(--inspector-width);
+  /* An explicit row pinned to the available height. The implicit row is
+     `auto`, which grows to fit a long tree and scrolls the whole page, taking
+     the toolbar and both side panels with it. */
+  grid-template-rows: minmax(0, 1fr);
   min-height: 0;
 }
 
@@ -70,6 +74,9 @@ select {
 .shell__main {
   position: relative;
   min-width: 0;
+  min-height: 0;
+  /* Anything tall inside scrolls itself; the main column never grows. */
+  overflow: hidden;
   background: var(--graph-bg);
 }
 
