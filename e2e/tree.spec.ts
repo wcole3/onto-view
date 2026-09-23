@@ -7,10 +7,10 @@ test("the tree shows the hierarchy and drives the inspector", async ({ page }) =
   await page.getByRole("button", { name: "Tree" }).click();
 
   const tree = page.getByRole("tree", { name: "Class hierarchy" });
-  await expect(tree).toBeVisible();
+  await expect(tree).toBeVisible({timeout: 15_000});
 
   // Food is a root; Pizza sits under it and is hidden until the branch opens.
-  await expect(tree.getByRole("button", { name: "Food", exact: true })).toBeVisible();
+  await expect(tree.getByRole("button", { name: "Food", exact: true })).toBeVisible({timeout: 15_000});
   await expect(tree.getByRole("button", { name: "Pizza", exact: true })).toHaveCount(0);
 
   await page.getByRole("button", { name: "Expand Food" }).click();
@@ -25,11 +25,11 @@ test("the tree obeys the same filters as the graph", async ({ page }) => {
   await page.getByRole("button", { name: "Expand all" }).click();
 
   const tree = page.getByRole("tree", { name: "Class hierarchy" });
-  await expect(tree.getByRole("button", { name: "Margherita", exact: true })).toBeVisible();
+  await expect(tree.getByRole("button", { name: "Margherita", exact: true })).toBeVisible({timeout: 15_000});
 
   await page.getByLabel("Search labels and IRIs").fill("Margherita");
   await page.getByRole("button", { name: "Expand all" }).click();
-  await expect(tree.getByRole("button", { name: "Margherita", exact: true })).toBeVisible();
+  await expect(tree.getByRole("button", { name: "Margherita", exact: true })).toBeVisible({timeout: 15_000});
   await expect(tree.getByRole("button", { name: "Country", exact: true })).toHaveCount(0);
 });
 

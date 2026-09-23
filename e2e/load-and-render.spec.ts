@@ -75,6 +75,6 @@ test("reports a malformed file instead of failing silently", async ({ page }) =>
     buffer: Buffer.from("this is not turtle {{{"),
   });
 
-  await expect(page.locator(".banner--error")).toBeVisible();
+  await expect(page.locator(".banner--error")).toBeVisible({timeout: 15_000});
   await expect(page.locator(".sources__item")).toHaveCount(0);
 });

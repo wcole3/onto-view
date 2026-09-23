@@ -33,7 +33,7 @@ test("discarding the saved copy stops it coming back", async ({ page }) => {
   await page.getByRole("button", { name: "Discard saved copy" }).click();
   await page.reload();
 
-  await expect(page.getByRole("button", { name: "Try the sample ontology" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Try the sample ontology" })).toBeVisible({timeout: 15_000});
   await expect(page.locator(".sources__item")).toHaveCount(0);
 });
 

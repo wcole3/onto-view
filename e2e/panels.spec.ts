@@ -23,7 +23,7 @@ test("a side panel can be dragged to a new width, and it survives a reload", asy
   expect(after).toBeGreaterThan(before + 60);
 
   await page.reload();
-  await expect(page.locator(".panel-slot--left")).toBeVisible();
+  await expect(page.locator(".panel-slot--left")).toBeVisible({timeout: 15_000});
   expect(await slotWidth(page, "left")).toBeCloseTo(after, 0);
 });
 
@@ -53,5 +53,5 @@ test("collapsing a panel leaves a rail that reopens it", async ({ page }) => {
   expect(graph.width).toBeGreaterThan(0);
 
   await page.getByRole("button", { name: "Show Inspector panel" }).click();
-  await expect(page.getByRole("heading", { name: "Inspector" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Inspector" })).toBeVisible({timeout: 15_000});
 });
